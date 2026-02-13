@@ -33,7 +33,7 @@ async function login() {
     await SystemConfig.findOneAndUpdate(
       { key: "AUTH_TOKEN" },
       { value: res.data },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     console.log("🔑 AUTH TOKEN UPDATED AND SAVED");

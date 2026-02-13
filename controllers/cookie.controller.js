@@ -77,7 +77,7 @@ async function generateCookie(providedToken) {
     await SystemConfig.findOneAndUpdate(
       { key: "COOKIE" },
       { value: { value: jsessionValue } },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     console.log("✅ COOKIE UPDATED SAFELY");
