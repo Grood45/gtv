@@ -19,10 +19,14 @@ async function getEventStream(req, res) {
         const streamingChannel = event.rawData?.streamingChannel;
         let streamUrl = event.streamUrl; // ⚡ Check existing URL
 
-        // 3. ON-DEMAND FETCH: If no URL or it's old/broken, fetch fresh
-        // (For now, we just check if it's missing)
-        if (!streamUrl && streamingChannel && streamingChannel !== "0") {
-            console.log(`🎥 ON-DEMAND STREAM FETCH for ${event.name} (${streamingChannel})...`);
+        // 3. ON-DEMAND FETCH: If no URL or it's old (expired)
+        const EXPIRY_TIME = 5 * 60 * 1000; // 5 Minutes
+        const isExpired = !event.updatedAt || (Date.now() - new Date(event.updatedAt).getTime() > EXPIRY_TIME);
+
+        if ((!streamUrl || isExpired) && streamingChannel && streamingChannel !== "0") {
+            const reason = !streamUrl ? "Missing URL" : "Expired URL";
+            console.log(`🎥 ON-DEMAND STREAM FETCH (${reason}) for ${event.name} (${streamingChannel})...`);
+
             try {
                 const streamData = await fetchStream(streamingChannel);
                 if (streamData && streamData.streamingUrl) {
@@ -31,12 +35,19 @@ async function getEventStream(req, res) {
                     // ⚡ UPDATE DB (Cache for next user)
                     await Event.updateOne(
                         { eventId },
-                        { $set: { streamUrl: streamUrl } }
+                        {
+                            $set: {
+                                streamUrl: streamUrl,
+                                updatedAt: new Date() // Force update timestamp
+                            }
+                        }
                     );
-                    console.log("✅ Stream Cached in DB.");
+                    console.log("✅ Stream Refreshed & Cached in DB.");
                 }
             } catch (err) {
                 console.log(`⚠️ On-Demand Fetch Failed: ${err.message}`);
+                // If fetch fails but we have an old URL, we might still return it (optional fallback)
+                // For now, we keep the old streamUrl if fetch fails, so user might still get something.
             }
         }
 

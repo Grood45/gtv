@@ -58,6 +58,10 @@ async function fetchStream(matchId, retry = true) {
 
   } catch (e) {
     console.log(`⚠️ STREAM FETCH FAILED (Match: ${matchId}):`, e.message);
+    if (e.response) {
+      console.log("Response Status:", e.response.status);
+      console.log("Response Data:", JSON.stringify(e.response.data));
+    }
 
     // 🔄 SELF-HEALING: Retry ONCE if unauthorized or cookie issue
     if (retry && (
