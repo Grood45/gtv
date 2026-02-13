@@ -3,7 +3,7 @@ module.exports = {
         {
             name: "fullgivecan-api",
             script: "./server.js",
-            instances: "max", // Use all CPU cores
+            instances: -1, // Use all CPU cores EXCEPT one (Safe for shared servers)
             exec_mode: "cluster", // Enable load balancing
             watch: false, // Don't watch files in production (use specialized tools or CI/CD)
             max_memory_restart: "500M", // Auto-restart if memory leaks
