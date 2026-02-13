@@ -20,6 +20,11 @@ sudo apt install -y nodejs
 sudo npm install -g pm2
 ```
 
+### Install Global Tools (PM2)
+```bash
+sudo npm install -g pm2
+```
+
 ## 2. Project Setup
 
 ### Clone Repository

@@ -1,5 +1,4 @@
 const axios = require("axios");
-const puppeteer = require("puppeteer");
 const SystemConfig = require("../models/SystemConfig");
 const { GAME_API } = require("../config/config");
 const { getToken } = require("../storage/token"); // ✅ latest token use
@@ -34,45 +33,43 @@ async function generateCookie(providedToken) {
 
     if (apiRes.status !== 200 || !apiRes.data?.data?.url) {
       console.log("⚠️ GAME API FAILED:", apiRes.status);
-      return GLOBAL_COOKIE; // 👈 fallback: old cookie
+      throw new Error(`GAME_API_FAILED_${apiRes.status}`);
     }
 
     const { url, params } = apiRes.data.data;
 
-    // 🔹 STEP 2: Puppeteer se session generate
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    // 🔹 STEP 2: NO-BROWSER FETCH (Axios manually handles the POST)
+    console.log("📡 FETCHING SESSION COOKIE (AXIOS)...");
+    const sessionRes = await axios.post(url, new URLSearchParams(params).toString(), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+      },
+      timeout: 20000,
+      maxRedirects: 0, // We only need the headers from the first response
+      validateStatus: (status) => status >= 200 && status < 400,
     });
 
-    const page = await browser.newPage();
+    const setCookie = sessionRes.headers["set-cookie"];
+    if (!setCookie || setCookie.length === 0) {
+      console.log("⚠️ NO COOKIE IN RESPONSE HEADERS");
+      throw new Error("COOKIE_HEADER_MISSING");
+    }
 
-    await page.setContent(`
-      <form id="f" method="POST" action="${url}">
-        ${Object.entries(params || {})
-        .map(([k, v]) => `<input type="hidden" name="${k}" value="${v}" />`)
-        .join("")}
-      </form>
-      <script>document.getElementById('f').submit()</script>
-    `);
+    // Find JSESSIONID in array of cookies
+    const jsessionHeader = setCookie.find((c) => c.includes("JSESSIONID"));
+    if (!jsessionHeader) {
+      console.log("⚠️ JSESSIONID NOT FOUND IN HEADERS");
+      throw new Error("JSESSIONID_NOT_FOUND_IN_HEADERS");
+    }
 
-    await page.waitForNavigation({
-      waitUntil: "networkidle2",
-      timeout: 60000,
-    });
-
-    const cookies = await page.cookies();
-    await browser.close();
-
-    const jsession = cookies.find(c => c.name === "JSESSIONID");
-
-    if (!jsession || !jsession.value) {
-      console.log("⚠️ JSESSIONID NOT FOUND");
-      return GLOBAL_COOKIE;
+    const jsessionValue = jsessionHeader.split("JSESSIONID=")[1]?.split(";")[0];
+    if (!jsessionValue) {
+      throw new Error("INVALID_JSESSIONID_VALUE");
     }
 
     // ✅ NEW COOKIE READY
-    NEW_COOKIE = `JSESSIONID=${jsession.value}`;
+    NEW_COOKIE = `JSESSIONID=${jsessionValue}`;
 
     // 🔥 Only replace global cookie now
     GLOBAL_COOKIE = NEW_COOKIE;
@@ -88,7 +85,7 @@ async function generateCookie(providedToken) {
 
   } catch (e) {
     console.log("❌ COOKIE ERROR:", e.message);
-    return GLOBAL_COOKIE; // fallback: old cookie
+    throw e; // ❗ Throw error so retry logic knows it failed
   } finally {
     COOKIE_REFRESHING = false;
   }

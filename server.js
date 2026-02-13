@@ -12,6 +12,9 @@ const { getEventStream } = require("./controllers/event.controller");
 
 const app = express();
 
+// 🔹 Trust Proxy (Required for Nginx + Rate Limit)
+app.set("trust proxy", 1);
+
 // ================= OPTIMIZATION & SECURITY =================
 const helmet = require("helmet");
 const compression = require("compression");
