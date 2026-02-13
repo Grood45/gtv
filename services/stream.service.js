@@ -14,6 +14,10 @@ async function fetchStream(matchId, retry = true) {
     // Extract token from cookie (Dynamic)
     const token = cookie.split("JSESSIONID=")[1]?.split(";")[0] || "";
 
+    const url = new URL(STREAM_API);
+    const host = url.host;
+    const origin = `${url.protocol}//${url.host.replace('bkqawscf.', 'www.')}`;
+
     const res = await axios.post(
       STREAM_API,
       new URLSearchParams({ matchId }).toString(),
@@ -22,7 +26,7 @@ async function fetchStream(matchId, retry = true) {
           'access-control-allow-credentials': 'true',
           'access-control-allow-headers': 'x-requested-with,Authorization,content-type,token,source',
           'access-control-allow-methods': 'POST, GET, OPTIONS',
-          'access-control-allow-origin': 'https://www.wic6k8ets.xyz',
+          'access-control-allow-origin': origin,
           'access-control-max-age': '600',
           'X-Firefox-Spdy': 'h2',
           'Accept': 'application/json, text/plain, */*',
@@ -32,9 +36,9 @@ async function fetchStream(matchId, retry = true) {
           'Connection': 'keep-alive',
           'Content-Type': 'application/x-www-form-urlencoded',
           'Cookie': cookie,
-          'Host': 'bkqawscf.wic6k8ets.xyz',
-          'Origin': 'https://www.wic6k8ets.xyz',
-          'Referer': 'https://www.wic6k8ets.xyz/',
+          'Host': host,
+          'Origin': origin,
+          'Referer': `${origin}/`,
           'Sec-Fetch-Dest': 'empty',
           'Sec-Fetch-Mode': 'cors',
           'Sec-Fetch-Site': 'same-site',

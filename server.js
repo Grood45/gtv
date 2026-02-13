@@ -37,6 +37,27 @@ app.get("/", (req, res) => res.send("GLIVE SERVER IS RUNNING"));
 app.get("/glivestreaming/v1/glive/:matchId", gliveHandler);
 app.get("/glivestreaming/v1/event/:eventId", getEventStream);
 
+const { getCookie } = require("./controllers/cookie.controller");
+const { getToken } = require("./controllers/auth.controller");
+
+app.get("/debug/status", (req, res) => {
+  res.json({
+    cookie: getCookie() ? "READY" : "MISSING",
+    token: getToken() ? "READY" : "MISSING",
+    env: process.env.NODE_ENV || "development"
+  });
+});
+
+app.get("/debug/events", async (req, res) => {
+  try {
+    const total = await Event.countDocuments();
+    const events = await Event.find({}, "eventId name streamUrl").limit(10).sort({ updatedAt: -1 }).lean();
+    res.json({ total, latest: events });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ================= WARMUP ON SERVER START =================
 const connectDB = require("./config/db");
 

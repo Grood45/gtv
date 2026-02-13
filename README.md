@@ -107,6 +107,23 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
+### Alternative: Sub-path Configuration (e.g., /live/)
+If you want to host the project under a sub-path like `domain.com/live/`, use this in your Nginx config:
+
+```nginx
+location /live/ {
+    proxy_pass http://127.0.0.1:4000/; # Note the trailing slash!
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+```
+**Note:** The trailing slash in `proxy_pass http://127.0.0.1:4000/;` tells Nginx to strip `/live/` before sending the request to Node.js. This means your **API routes in the code will not change**.
+
+
 ## 6. SSL Certificate (HTTPS) - Optional but Recommended
 Use Certbot to get a free SSL certificate.
 

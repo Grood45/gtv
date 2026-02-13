@@ -2,7 +2,7 @@ const axios = require("axios");
 const FormData = require("form-data");
 const SystemConfig = require("../models/SystemConfig");
 const { LOGIN_URL, AUTH } = require("../config/config");
-const { setToken } = require("../storage/token"); // ensure storage/token.js exist
+const { setToken, getToken } = require("../storage/token"); // ensure storage/token.js exist
 
 async function login() {
   try {
@@ -59,4 +59,4 @@ async function loadToken() {
   return null;
 }
 
-module.exports = { login, loadToken };
+module.exports = { login, loadToken, getToken };
