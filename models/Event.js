@@ -12,7 +12,6 @@ const eventSchema = new mongoose.Schema({
 });
 
 // ⚡ Indexes for High Performance
-eventSchema.index({ eventId: 1 });
 eventSchema.index({ "rawData.streamingChannel": 1 });
 
 module.exports = mongoose.model("Event", eventSchema);
