@@ -4,7 +4,6 @@ const { fetchStream } = require("../services/stream.service");
 async function getEventStream(req, res) {
     try {
         const { eventId } = req.params;
-        const { unwrapFastOdds } = require("../utils/stream.utils");
 
         // 1. Find Event in DB
         const event = await Event.findOne({ eventId });
@@ -18,47 +17,39 @@ async function getEventStream(req, res) {
 
         // 2. Extract Streaming Channel
         const streamingChannel = event.rawData?.streamingChannel;
-        let streamUrl = event.streamUrl; // ⚡ Check existing URL
+        let streamUrl = event.streamUrl;
 
-        // 3. ON-DEMAND FETCH: If no URL or it's old (expired)
-        // ⚡ SMART PERSISTENCE: Keep link for 4 minutes so multiple users share the SAME active stream.
-        // Fetching a new link too often (e.g., 15s) invalidates the previous one, killing the stream for others.
-        const EXPIRY_TIME = 1 * 60 * 1000; // 1 Minute (Reduced)
+        console.log(`[EVENT_HIT] User requested stream for: ${event.name} (ID: ${eventId}, Channel: ${streamingChannel})`);
 
-        // Check if expired
-        const isExpired = !event.updatedAt || (Date.now() - new Date(event.updatedAt).getTime() > EXPIRY_TIME);
-
-        if ((!streamUrl || isExpired) && streamingChannel && streamingChannel !== "0") {
-            const reason = !streamUrl ? "Missing URL" : "Expired URL";
-            console.log(`🎥 ON-DEMAND STREAM FETCH (${reason}) for ${event.name} (${streamingChannel})...`);
+        // 3. ON-DEMAND FETCH: Fetch fresh URL every time if streamingChannel is valid
+        if (streamingChannel && streamingChannel !== "0") {
+            console.log(`🎥 [FETCH_START] Fetching fresh stream for ${event.name} (${streamingChannel})...`);
 
             try {
                 const streamData = await fetchStream(streamingChannel);
                 if (streamData && streamData.streamingUrl) {
                     streamUrl = streamData.streamingUrl;
 
-                    // ⚡ UPDATE DB (Cache for next user)
+                    // ⚡ UPDATE DB (Always update with fresh link)
                     await Event.updateOne(
                         { eventId },
                         {
                             $set: {
                                 streamUrl: streamUrl,
-                                updatedAt: new Date() // Force update timestamp
+                                updatedAt: new Date()
                             }
                         }
                     );
-                    console.log("✅ Stream Refreshed & Cached in DB.");
+                    console.log(`✅ [FETCH_SUCCESS] Stream URL found: ${streamUrl}`);
+                } else {
+                    console.log(`⚠️ [FETCH_EMPTY] API returned success but no URL for channel: ${streamingChannel}`);
                 }
             } catch (err) {
-                console.log(`⚠️ On-Demand Fetch Failed: ${err.message}`);
-                // If fetch fails but we have an old URL, we might still return it (optional fallback)
-                // For now, we keep the old streamUrl if fetch fails, so user might still get something.
+                console.log(`❌ [FETCH_ERROR] Failed for ${event.name}: ${err.message}`);
+                // Fallback to old streamUrl if fetch fails
             }
-        }
-
-        // Unwrap FastOdds URL
-        if (streamUrl) {
-            streamUrl = await unwrapFastOdds(streamUrl);
+        } else if (streamingChannel === "0") {
+            console.log(`🚫 [FETCH_SKIP] Channel is "0" for ${event.name} - No streaming available.`);
         }
 
         // 4. Return JSON
@@ -71,7 +62,7 @@ async function getEventStream(req, res) {
                 score: event.rawData?.scores,
                 streamingChannel: streamingChannel,
                 streamUrl: streamUrl,
-                embedUrl: `${req.protocol}://${req.get("host")}/live/embed/${eventId}`
+
             }
         });
 

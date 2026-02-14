@@ -1,14 +1,14 @@
 const { fetchStream } = require("../services/stream.service");
 
-const { unwrapFastOdds } = require("../utils/stream.utils");
-
 async function gliveHandler(req, res) {
   try {
+    console.log(`[GLIVE_HIT] Requesting stream for Match ID: ${req.params.matchId}`);
     const data = await fetchStream(req.params.matchId);
 
-    // Unwrap FastOdds URL if present
     if (data && data.streamingUrl) {
-      data.streamingUrl = await unwrapFastOdds(data.streamingUrl);
+      console.log(`✅ [GLIVE_SUCCESS] Stream obtained for Match ${req.params.matchId}: ${data.streamingUrl}`);
+    } else {
+      console.log(`⚠️ [GLIVE_EMPTY] No stream URL returned for Match ${req.params.matchId}`);
     }
 
     res.json(data);

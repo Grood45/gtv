@@ -1,0 +1,298 @@
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: [EVENT_HIT] User requested stream for: Rhinos v Eagles (ID: -11024074, Channel: 19764404)
+2026-02-14 20:18 +05:30: 🎥 [FETCH_START] Fetching fresh stream for Rhinos v Eagles (19764404)...
+2026-02-14 20:18 +05:30: ✅ [FETCH_SUCCESS] Stream URL found: https://www.glivestreaming.com/livetv/15/9w/gugo/19764404/9w3bcwgn006770f6/613006ebcc68a709a7884bbfae76b6d6/103.28.252.81/1771080485?=&lang=en
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  override existing env vars with { override: true }
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  override existing env vars with { override: true }
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+2026-02-14 20:18 +05:30: ⚡ WARMUP START
+2026-02-14 20:18 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:18 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:18 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:18 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:18 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:19 +05:30: [EVENT_HIT] User requested stream for: Rhinos v Eagles (ID: -11024074, Channel: 19764404)
+2026-02-14 20:19 +05:30: 🎥 [FETCH_START] Fetching fresh stream for Rhinos v Eagles (19764404)...
+2026-02-14 20:19 +05:30: ✅ [FETCH_SUCCESS] Stream URL found: https://www.glivestreaming.com/livetv/15/9w/gugo/19764404/9w3bcwgn006770f6/1419f8e43141db30ad4042225ebf924d/103.28.252.81/1771080544?=&lang=en
+2026-02-14 20:19 +05:30: [EVENT_HIT] User requested stream for: Rhinos v Eagles (ID: -11024074, Channel: 19764404)
+2026-02-14 20:19 +05:30: 🎥 [FETCH_START] Fetching fresh stream for Rhinos v Eagles (19764404)...
+2026-02-14 20:19 +05:30: ✅ [FETCH_SUCCESS] Stream URL found: https://www.glivestreaming.com/livetv/15/9w/gugo/19764404/9w3bcwgn006770f6/24c9c3a7e5b142c75a36416f3d804fd6/103.28.252.81/1771080553?=&lang=en
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: [dotenv@17.3.1] injecting env (2) from .env -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+2026-02-14 20:19 +05:30: ⚡ WARMUP START
+2026-02-14 20:19 +05:30: 🚀 GLIVE RUNNING ON PORT 4000
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-00.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-01.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: ✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ✅ LOADED TOKEN FROM DB
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: ✅ LOADED COOKIE FROM DB
+2026-02-14 20:19 +05:30: 🚀 SYSTEM READY (FAST START)
+2026-02-14 20:19 +05:30: ✅ SYSTEM READY: TOKEN & COOKIE SET
+2026-02-14 20:19 +05:30: [EVENT_HIT] User requested stream for: Rhinos v Eagles (ID: -11024074, Channel: 19764404)
+2026-02-14 20:19 +05:30: 🎥 [FETCH_START] Fetching fresh stream for Rhinos v Eagles (19764404)...
+2026-02-14 20:19 +05:30: ✅ [FETCH_SUCCESS] Stream URL found: https://www.glivestreaming.com/livetv/15/9w/gugo/19764404/9w3bcwgn006770f6/aff1c11f7d8efb349f1a8e328ba10c2e/103.28.252.81/1771080573?=&lang=en
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB
+2026-02-14 20:20 +05:30: ✅ SAVED 146 EVENTS TO MONGODB

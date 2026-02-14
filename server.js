@@ -54,10 +54,7 @@ app.get("/glivestreaming/v1/event/:eventId", getEventStream);
 const { getCookie } = require("./controllers/cookie.controller");
 const { getToken } = require("./controllers/auth.controller");
 
-// 📺 DIRECT IFRAME PLAYER ROUTE (Wrapper)
-const { getPlayerPage } = require("./controllers/player.controller");
-app.get("/live/embed/:eventId", getPlayerPage);
-app.get("/embed/:eventId", getPlayerPage);
+
 
 // (Proxy routes removed as requested)
 
