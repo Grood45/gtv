@@ -21,7 +21,18 @@ const compression = require("compression");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 
-app.use(helmet()); // Security Headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://*.skyinplay.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      mediaSrc: ["'self'", "blob:", "https:"],
+      frameSrc: ["'self'", "https:"] // 🟢 ALLOW EXTERNAL IFRAMES
+    }
+  }
+})); // Security Headers
 app.use(compression()); // Gzip Compression
 app.use(cors()); // Allow Cross-Origin Requests
 
@@ -42,6 +53,61 @@ app.get("/glivestreaming/v1/event/:eventId", getEventStream);
 
 const { getCookie } = require("./controllers/cookie.controller");
 const { getToken } = require("./controllers/auth.controller");
+
+// 📺 DIRECT IFRAME PLAYER ROUTE (Wrapper)
+const { getPlayerPage } = require("./controllers/player.controller");
+app.get("/live/embed/:eventId", getPlayerPage);
+app.get("/embed/:eventId", getPlayerPage);
+
+// (Proxy routes removed as requested)
+
+// 🛠️ TEST PAGE (Generates Iframe)
+app.get("/test", (req, res) => {
+  res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>GLive Embed Tester</title>
+            <style>
+                body { font-family: sans-serif; padding: 20px; text-align: center; background: #f0f0f0; }
+                input { padding: 10px; width: 300px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
+                button { padding: 10px 20px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+                button:hover { background: #0056b3; }
+                #result { margin-top: 20px; }
+                textarea { width: 80%; height: 60px; margin-top: 10px; font-family: monospace; }
+                iframe { margin-top: 20px; border: 2px solid #000; background: #000; }
+            </style>
+        </head>
+        <body>
+            <h1>GLive Embed Generator</h1>
+            <p>Enter Event ID to generate Iframe and watch stream.</p>
+            <input type="text" id="eventId" placeholder="Enter Event ID (e.g., 35254881)" value="35254881" />
+            <button onclick="generate()">Play Stream</button>
+            
+            <div id="result" style="display:none;">
+                <h3>Copy This Code:</h3>
+                <textarea id="code" readonly></textarea>
+                <h3>Preview:</h3>
+                <div id="preview"></div>
+            </div>
+
+            <script>
+                function generate() {
+                    var id = document.getElementById('eventId').value.trim();
+                    if(!id) return alert("Please enter Event ID");
+                    
+                    var url = window.location.origin + "/embed/" + id;
+                    var code = '<iframe src="' + url + '" width="100%" height="450px" frameborder="0" allowfullscreen></iframe>';
+                    
+                    document.getElementById('code').value = code;
+                    document.getElementById('preview').innerHTML = code;
+                    document.getElementById('result').style.display = 'block';
+                }
+            </script>
+        </body>
+        </html>
+    `);
+});
 
 app.get("/debug/status", (req, res) => {
   res.json({

@@ -20,8 +20,9 @@ async function getEventStream(req, res) {
         let streamUrl = event.streamUrl; // ⚡ Check existing URL
 
         // 3. ON-DEMAND FETCH: If no URL or it's old (expired)
-        // ⚡ SMART CACHING: Only keep link for 15 seconds to ensure freshness.
-        const EXPIRY_TIME = 15 * 1000; // 15 Seconds (Was 5 mins)
+        // ⚡ SMART PERSISTENCE: Keep link for 4 minutes so multiple users share the SAME active stream.
+        // Fetching a new link too often (e.g., 15s) invalidates the previous one, killing the stream for others.
+        const EXPIRY_TIME = 4 * 60 * 1000; // 4 Minutes
 
         // Check if expired
         const isExpired = !event.updatedAt || (Date.now() - new Date(event.updatedAt).getTime() > EXPIRY_TIME);
@@ -63,7 +64,8 @@ async function getEventStream(req, res) {
                 eventType: event.eventType,
                 score: event.rawData?.scores,
                 streamingChannel: streamingChannel,
-                streamUrl: streamUrl
+                streamUrl: streamUrl,
+                embedUrl: `${req.protocol}://${req.get("host")}/embed/${eventId}`
             }
         });
 
