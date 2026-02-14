@@ -65,7 +65,7 @@ async function getEventStream(req, res) {
                 score: event.rawData?.scores,
                 streamingChannel: streamingChannel,
                 streamUrl: streamUrl,
-                embedUrl: `${req.protocol}://${req.get("host")}/embed/${eventId}`
+                embedUrl: `${req.protocol}://${req.get("host")}/live/embed/${eventId}`
             }
         });
 
