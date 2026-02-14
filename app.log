@@ -1,0 +1,20 @@
+
+> fullgivecan@1.0.0 start
+> node server.js
+
+[dotenv@17.3.1] injecting env (2) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+⚡ WARMUP START
+🚀 GLIVE RUNNING ON PORT 4000
+✅ MongoDB Connected: ac-cvml1wh-shard-00-02.5ldue7g.mongodb.net
+✅ LOADED TOKEN FROM DB
+✅ LOADED COOKIE FROM DB
+🚀 SYSTEM READY (FAST START)
+✅ SYSTEM READY: TOKEN & COOKIE SET
+✅ SAVED 109 EVENTS TO MONGODB
+♻️ AUTH + COOKIE CRON START
+🔑 AUTH TOKEN UPDATED AND SAVED
+✅ AUTH TOKEN RECEIVED
+✅ SAVED 109 EVENTS TO MONGODB
+📡 FETCHING SESSION COOKIE (AXIOS)...
+✅ COOKIE UPDATED SAFELY
+✅ COOKIE UPDATED SUCCESSFULLY

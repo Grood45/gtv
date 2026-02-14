@@ -4,6 +4,7 @@ const { fetchStream } = require("../services/stream.service");
 async function getEventStream(req, res) {
     try {
         const { eventId } = req.params;
+        const { unwrapFastOdds } = require("../utils/stream.utils");
 
         // 1. Find Event in DB
         const event = await Event.findOne({ eventId });
@@ -53,6 +54,11 @@ async function getEventStream(req, res) {
                 // If fetch fails but we have an old URL, we might still return it (optional fallback)
                 // For now, we keep the old streamUrl if fetch fails, so user might still get something.
             }
+        }
+
+        // Unwrap FastOdds URL
+        if (streamUrl) {
+            streamUrl = await unwrapFastOdds(streamUrl);
         }
 
         // 4. Return JSON

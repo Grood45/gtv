@@ -8,6 +8,9 @@ const { generateCookie } = require("../controllers/cookie.controller");
 async function fetchStream(matchId, retry = true) {
   try {
     const cookie = getCookie();
+
+
+
     if (!cookie) throw new Error("COOKIE_NOT_READY");
 
     // const token = cookie.split("JSESSIONID=")[1]?.split(";")[0] || "";
