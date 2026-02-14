@@ -12,8 +12,8 @@ async function getPlayerPage(req, res) {
         // 1. Get Fresh Stream URL (Server-Side Logic)
         let streamUrl = event.streamUrl;
         const streamingChannel = event.rawData?.streamingChannel;
-        // Smart Cache: 4 mins expiry
-        const EXPIRY_TIME = 4 * 60 * 1000;
+        // Smart Cache: 1 min expiry (Reduced from 4 mins for FastOdds)
+        const EXPIRY_TIME = 1 * 60 * 1000;
         const isExpired = !event.updatedAt || (Date.now() - new Date(event.updatedAt).getTime() > EXPIRY_TIME);
 
         // If no URL or expired, fetch NEW one
@@ -27,33 +27,42 @@ async function getPlayerPage(req, res) {
             }
         }
 
-        // ⚡ SPECIAL FIX: Unwrap "fastodds.online" wrapper
-        // The wrapper blocks embedding (X-Frame-Options), but the inner iframe allows it.
+        // ⚡ SPECIAL FIX: Unwrap "fastodds.online" wrapper & Check Expiry
         if (streamUrl && streamUrl.includes("fastodds.online")) {
             console.log(`🔓 Unwrapping FastOdds Encrypted Stream: ${streamUrl}`);
-            try {
-                const response = await axios.get(streamUrl, {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            streamUrl = await unwrapFastOdds(streamUrl);
+
+            // 🕵️‍♂️ SMART EXPIRY CHECK
+            // Extract timestamp from inner URL (e.g., .../1771076828?...)
+            const tsMatch = streamUrl.match(/\/(\d{10})(\?|$)/);
+            if (tsMatch && tsMatch[1]) {
+                const expiryTs = parseInt(tsMatch[1]);
+                const nowSec = Math.floor(Date.now() / 1000);
+                const timeLeft = expiryTs - nowSec;
+
+                console.log(`⏳ Stream Expiry Check: Expires in ${timeLeft}s (TS: ${expiryTs})`);
+
+                // If expired or expires in < 30s
+                if (timeLeft < 30) {
+                    console.log(`⚠️ Inner URL Expired/Expiring! Force Refreshing...`);
+
+                    if (streamingChannel) {
+                        try {
+                            const data = await fetchStream(streamingChannel);
+                            if (data?.streamingUrl) {
+                                console.log(`🔄 Got Fresh Link: ${data.streamingUrl}`);
+                                // Update DB
+                                await Event.updateOne({ eventId }, { $set: { streamUrl: data.streamingUrl, updatedAt: new Date() } });
+
+                                // Unwrap the NEW link
+                                streamUrl = await unwrapFastOdds(data.streamingUrl);
+                                console.log(`✅ Fresh Unwrapped URL: ${streamUrl}`);
+                            }
+                        } catch (err) {
+                            console.log(`❌ Force Refresh Failed: ${err.message}`);
+                        }
                     }
-                });
-
-                // Extract src="..." from the first iframe found
-                const match = response.data.match(/<iframe\s+src="([^"]+)"/);
-                if (match && match[1]) {
-                    const innerUrl = match[1];
-                    console.log(`✅ Unwrapped URL: ${innerUrl}`);
-                    streamUrl = innerUrl;
-
-                    // Optional: Update DB with the unwrapped URL to save future fetches? 
-                    // No, let's keep the original source in DB as "source of truth" and unwrap on fly,
-                    // or valid tokens might expire if we just store the final link forever.
-                    // Actually, the inner link likely has a token too. Let's just use it for now.
-                } else {
-                    console.log("⚠️ Could not find inner iframe in FastOdds wrapper.");
                 }
-            } catch (err) {
-                console.log(`❌ Failed to unwrap FastOdds: ${err.message}`);
             }
         }
 
@@ -106,6 +115,23 @@ async function getPlayerPage(req, res) {
     } catch (e) {
         console.error("❌ PLAYER SSR ERROR:", e.message);
         res.status(500).send("Player Error");
+    }
+}
+
+// Helper to unwrap FastOdds
+async function unwrapFastOdds(url) {
+    if (!url || !url.includes("fastodds.online")) return url;
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+        });
+        const match = response.data.match(/<iframe\s+src="([^"]+)"/);
+        return match && match[1] ? match[1] : url;
+    } catch (e) {
+        console.log(`❌ Unwrap Error: ${e.message}`);
+        return url;
     }
 }
 

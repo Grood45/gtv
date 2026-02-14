@@ -22,7 +22,7 @@ async function getEventStream(req, res) {
         // 3. ON-DEMAND FETCH: If no URL or it's old (expired)
         // ⚡ SMART PERSISTENCE: Keep link for 4 minutes so multiple users share the SAME active stream.
         // Fetching a new link too often (e.g., 15s) invalidates the previous one, killing the stream for others.
-        const EXPIRY_TIME = 4 * 60 * 1000; // 4 Minutes
+        const EXPIRY_TIME = 1 * 60 * 1000; // 1 Minute (Reduced)
 
         // Check if expired
         const isExpired = !event.updatedAt || (Date.now() - new Date(event.updatedAt).getTime() > EXPIRY_TIME);
