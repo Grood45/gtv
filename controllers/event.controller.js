@@ -20,7 +20,10 @@ async function getEventStream(req, res) {
         let streamUrl = event.streamUrl; // ⚡ Check existing URL
 
         // 3. ON-DEMAND FETCH: If no URL or it's old (expired)
-        const EXPIRY_TIME = 5 * 60 * 1000; // 5 Minutes
+        // ⚡ SMART CACHING: Only keep link for 15 seconds to ensure freshness.
+        const EXPIRY_TIME = 15 * 1000; // 15 Seconds (Was 5 mins)
+
+        // Check if expired
         const isExpired = !event.updatedAt || (Date.now() - new Date(event.updatedAt).getTime() > EXPIRY_TIME);
 
         if ((!streamUrl || isExpired) && streamingChannel && streamingChannel !== "0") {
