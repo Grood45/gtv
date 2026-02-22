@@ -1,0 +1,14 @@
+{
+  "name": "JSESSIONID",
+  "value": "DBFB708BD5D45C32400A07BB215AC03B.player05",
+  "domain": ".gu21go76.xyz",
+  "path": "/",
+  "expires": -1,
+  "size": 51,
+  "httpOnly": true,
+  "secure": false,
+  "session": true,
+  "priority": "Medium",
+  "sameParty": false,
+  "sourceScheme": "Secure"
+}
