@@ -9,6 +9,7 @@ require("./cron/inplay.cron");
 
 const { gliveHandler } = require("./controllers/glive.controller");
 const { getEventStream } = require("./controllers/event.controller");
+const fancyRoutes = require("./routes/fancy.routes");
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.get("/", (req, res) => res.send("GLIVE SERVER IS RUNNING"));
 // ================= API ROUTE =================
 app.get("/glivestreaming/v1/glive/:matchId", gliveHandler);
 app.get("/glivestreaming/v1/event/:eventId", getEventStream);
+app.use("/glivestreaming/v1/fancy", fancyRoutes);
 
 const { getCookie } = require("./controllers/cookie.controller");
 const { getToken } = require("./controllers/auth.controller");

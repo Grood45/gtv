@@ -10,7 +10,7 @@ module.exports = {
     "https://bkqawscf.gu21go76.xyz/exchange/member/playerService/getStreamingUrl",
 
   AUTH: {
-    account_id: "7982720942",
+    account_id: "7895289296",
     password: "Sher@123",
     country_code: "91",
   },

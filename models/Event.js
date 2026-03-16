@@ -13,6 +13,5 @@ const eventSchema = new mongoose.Schema({
 
 // ⚡ Indexes for High Performance
 eventSchema.index({ "rawData.streamingChannel": 1 });
-eventSchema.index({ updatedAt: 1 }, { expireAfterSeconds: 172800 }); // ✨ AUTO-DELETE AFTER 48 HOURS (172800 sec)
 
 module.exports = mongoose.model("Event", eventSchema);
