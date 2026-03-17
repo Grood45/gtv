@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: "fullgivecan-api",
+            name: "glivestreeming",
             script: "./server.js",
             instances: -1, // Use all CPU cores EXCEPT one (Safe for shared servers)
             exec_mode: "cluster", // Enable load balancing
