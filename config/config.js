@@ -9,8 +9,23 @@ module.exports = {
   STREAM_API:
     "https://bkqawscf.gu21go76.xyz/exchange/member/playerService/getStreamingUrl",
 
+  LIVE_EVENT_COUNT_API:
+    "https://saapipl.gu21go76.xyz/exchange/member/playerService/queryOnLiveEvents",
+
+  EVENTS_API:
+    "https://bxawscf.skyinplay.com/exchange/member/playerService/queryEvents",
+
+  SPORT_EVENTS_API:
+    "https://saapipl.gu21go76.xyz/exchange/member/playerService/queryEventsWithMarket",
+
+  BOOKMAKER_API:
+    "https://saapipl.gu21go76.xyz/exchange/member/playerService/queryBookMakerMarkets",
+
+  FULL_MARKETS_API:
+    "https://saapipl.gu21go76.xyz/exchange/member/playerService/queryFullMarkets",
+
   AUTH: {
-    account_id: "7982720942",
+    account_id: "7895289296",
     password: "Sher@123",
     country_code: "91",
   },

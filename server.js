@@ -6,10 +6,19 @@ const { generateCookie, loadCookie } = require("./controllers/cookie.controller"
 // 🔹 Start cron jobs (auth + cookie)
 require("./cron/cookie.cron");
 require("./cron/inplay.cron");
+require("./cron/eventCount.cron");
+require("./cron/liveEvents.cron");
+require("./cron/sportEvents.cron");
+require("./cron/cleanup.cron");
 
 const { gliveHandler } = require("./controllers/glive.controller");
 const { getEventStream } = require("./controllers/event.controller");
 const fancyRoutes = require("./routes/fancy.routes");
+const eventCountRoutes = require("./routes/eventCount.routes");
+const liveEventsRoutes = require("./routes/liveEvents.routes");
+const sportEventsRoutes = require("./routes/sportEvents.routes");
+const bookmakerRoutes = require("./routes/bookmaker.routes");
+const fullMarketsRoutes = require("./routes/fullMarkets.routes");
 
 const app = express();
 
@@ -39,9 +48,10 @@ app.use(cors()); // Allow Cross-Origin Requests
 
 // Rate Limiting (Prevent Abuse)
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 300, // Limit each IP to 300 requests per windowMs
-  message: "Too many requests from this IP, please try again after 15 minutes."
+  windowMs: 1 * 60 * 1000, // Reduced to 1 minute for faster recovery
+  max: 1000, // Increased limit for normal users
+  message: "Too many requests, please try again after a minute.",
+  skip: (req) => req.path.startsWith("/nw/v1") // 🟢 UNLIMITED FOR OPTIMIZED CLIENT API
 });
 app.use(limiter);
 // ========================================================
@@ -51,7 +61,13 @@ app.get("/", (req, res) => res.send("GLIVE SERVER IS RUNNING"));
 // ================= API ROUTE =================
 app.get("/glivestreaming/v1/glive/:matchId", gliveHandler);
 app.get("/glivestreaming/v1/event/:eventId", getEventStream);
-app.use("/glivestreaming/v1/fancy", fancyRoutes);
+app.use("/glivestreaming/v1/fancy", fancyRoutes); // Legacy support
+app.use("/nw/v1/fancy", fancyRoutes); // Optimized path
+app.use("/nw/v1", eventCountRoutes);
+app.use("/nw/v1", liveEventsRoutes);
+app.use("/nw/v1/sport", sportEventsRoutes);
+app.use("/nw/v1/bookmaker", bookmakerRoutes);
+app.use("/nw/v1/fullMarkets", fullMarketsRoutes);
 
 const { getCookie } = require("./controllers/cookie.controller");
 const { getToken } = require("./controllers/auth.controller");
