@@ -1,4 +1,5 @@
 const { getCachedBookmaker, fetchAndCacheBookmaker } = require('../services/bookmaker.service');
+const { trackEvent } = require('../utils/syncTracker');
 
 async function getBookmakerMarkets(req, res) {
     const { eventId } = req.params;
@@ -8,11 +9,15 @@ async function getBookmakerMarkets(req, res) {
     }
 
     try {
+        // 🎯 1. Ping Sync Tracker
+        trackEvent(eventId).catch(e => console.error("❌ Sync Tracker Error (Bookmaker):", e.message));
+
+        // 🎯 2. Try Cache First
         let data = await getCachedBookmaker(eventId);
 
-        // Cache miss recovery
+        // 🎯 3. Cache Miss Recovery (Worker will handle subsequent refreshes)
         if (!data) {
-            console.log(`⚡ Cache miss for Bookmaker event ${eventId}, fetching fresh data...`);
+            console.log(`⚡ [BOOKMAKER] Cache miss for event ${eventId}, fetching fresh data...`);
             data = await fetchAndCacheBookmaker(eventId);
         }
 

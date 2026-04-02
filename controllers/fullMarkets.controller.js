@@ -1,4 +1,5 @@
 const { getCachedFullMarkets, fetchAndCacheFullMarkets } = require('../services/fullMarkets.service');
+const { trackMarket } = require('../utils/syncTracker');
 
 async function getFullMarkets(req, res) {
     const { eventId, marketId } = req.params;
@@ -8,11 +9,15 @@ async function getFullMarkets(req, res) {
     }
 
     try {
+        // 🎯 1. Ping Sync Tracker (Track eventId:marketId pair)
+        trackMarket(eventId, marketId).catch(e => console.error("❌ Sync Tracker Error (Full Markets):", e.message));
+
+        // 🎯 2. Try Cache First
         let data = await getCachedFullMarkets(eventId, marketId);
 
-        // Cache miss recovery
+        // 🎯 3. Cache Miss Recovery (Worker will handle sync every 1.5s)
         if (!data) {
-            console.log(`⚡ Cache miss for Full Markets event ${eventId}, fetch initial...`);
+            console.log(`⚡ [FULL_MARKETS] Cache miss for event ${eventId}, fetch initial...`);
             data = await fetchAndCacheFullMarkets(eventId, marketId);
         }
 

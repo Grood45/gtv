@@ -1,24 +1,7 @@
 const axios = require('axios');
-const { createClient } = require('redis');
+const redisClient = require('../utils/redis');
 const { getCookie, generateCookie } = require('../controllers/cookie.controller');
 const { login } = require('../controllers/auth.controller');
-
-// Initialize Redis Client
-const redisClient = createClient({
-    url: process.env.REDIS_URI || 'redis://localhost:6379'
-});
-
-redisClient.on('error', (err) => console.log('Redis Client Error', err));
-redisClient.on('connect', () => console.log('✅ Connected to Redis for Fancy Odds'));
-
-// Connect to Redis on script load
-(async () => {
-    try {
-        await redisClient.connect();
-    } catch (e) {
-        console.error('❌ Failed to connect to Redis initially:', e.message);
-    }
-})();
 
 const FANCY_API_URL = "https://bkqawscf.gu21go76.xyz/exchange/member/playerService/queryFancyBetMarkets";
 

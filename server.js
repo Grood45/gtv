@@ -19,6 +19,7 @@ const liveEventsRoutes = require("./routes/liveEvents.routes");
 const sportEventsRoutes = require("./routes/sportEvents.routes");
 const bookmakerRoutes = require("./routes/bookmaker.routes");
 const fullMarketsRoutes = require("./routes/fullMarkets.routes");
+const { startBackgroundSync } = require("./services/sync.service");
 
 const app = express();
 
@@ -165,6 +166,12 @@ const connectDB = require("./config/db");
     }
 
     console.log("✅ SYSTEM READY: TOKEN & COOKIE SET");
+
+    // 🚀 3️⃣ START BACKGROUND SYNC (Wait 5s to ensure everything is stable)
+    setTimeout(() => {
+       startBackgroundSync();
+    }, 5000);
+
   } catch (e) {
     console.log("❌ WARMUP FAILED:", e.message);
   }
