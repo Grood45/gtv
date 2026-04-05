@@ -3,58 +3,101 @@ const { getFancyOdds } = require('./fancy.service');
 const { fetchAndCacheBookmaker } = require('./bookmaker.service');
 const { fetchAndCacheFullMarkets } = require('./fullMarkets.service');
 
-const SYNC_INTERVAL_MS = 1500; // 1.5 Seconds for ultra-fast sync
-const MAX_CONCURRENT_MATCHES = 15; // Limit to 15 active matches to avoid IP bans
+// 🚀 PULSE CONFIGURATION (Expert Level Timing)
+const PULSE_MATCH_ODDS = 350;    // 350ms for Match Odds
+const PULSE_BOOKMAKER = 1000;    // 1s for Bookmaker
+const PULSE_FANCY = 1000;        // 1s for Fancy
+const SYNC_LOOP_TICK = 100;      // 100ms master tick
+
+const MAX_CONCURRENT_MATCHES = 20; // Slightly higher for multi-pulse
+
+// Track last-run times to maintain separate "pulses"
+const lastRunTimes = new Map();
 
 let isSyncRunning = false;
 
+/**
+ * 🕵️ Expert Sync Orchestrator
+ * Uses a pulse-based model where each market type has its own frequency.
+ * Includes 'Jitter' to prevent robotic rhythm detection.
+ */
 async function startBackgroundSync() {
     if (isSyncRunning) return;
     isSyncRunning = true;
-    console.log(`🚀 [SYNC] Background Sync Started (Interval: ${SYNC_INTERVAL_MS}ms)`);
+    console.log(`🚀 [SYNC] Expert Pulse-Based Sync Started (Tick: ${SYNC_LOOP_TICK}ms)`);
 
     while (isSyncRunning) {
         try {
-            const startTime = Date.now();
+            const now = Date.now();
             const { eventIds, marketPairs } = await getActiveSyncTasks();
 
             if (eventIds.length === 0 && marketPairs.length === 0) {
-                 // No active users, sleep and check again
-                 await new Promise(resolve => setTimeout(resolve, SYNC_INTERVAL_MS));
+                 await new Promise(resolve => setTimeout(resolve, 1000)); // Idling
                  continue;
             }
 
-            // Cap the number of synced items to prevent IP bans
-            const limitedEventIds = eventIds.slice(0, MAX_CONCURRENT_MATCHES);
-            const limitedMarketPairs = marketPairs.slice(0, MAX_CONCURRENT_MATCHES);
+            const syncTasks = [];
 
-            console.log(`🔄 [SYNC] Syncing ${limitedEventIds.length} Events and ${limitedMarketPairs.length} Markets...`);
+            // 1. MATCH ODDS PULSE (Ultra-Fast)
+            const dueMarkets = marketPairs.filter(([eventId, marketId]) => {
+                const key = `market:${marketId}`;
+                const lastRun = lastRunTimes.get(key) || 0;
+                // Add jitter: ±20ms
+                const jitter = Math.floor(Math.random() * 40) - 20; 
+                return (now - lastRun) >= (PULSE_MATCH_ODDS + jitter);
+            }).slice(0, MAX_CONCURRENT_MATCHES);
 
-            // 1. Sync Fancy & Bookmaker
-            const fancyPromises = limitedEventIds.map(eventId => 
-                getFancyOdds(eventId, true).catch(e => console.error(`❌ [SYNC_FANCY] Error ${eventId}:`, e.message))
-            );
+            dueMarkets.forEach(([eventId, marketId]) => {
+                const key = `market:${marketId}`;
+                lastRunTimes.set(key, now);
+                syncTasks.push(fetchAndCacheFullMarkets(eventId, marketId, true));
+            });
 
-            const bookmakerPromises = limitedEventIds.map(eventId => 
-                fetchAndCacheBookmaker(eventId, true).catch(e => console.error(`❌ [SYNC_BOOKMAKER] Error ${eventId}:`, e.message))
-            );
+            // 2. BOOKMAKER PULSE (Standard)
+            const dueBookmakers = eventIds.filter(eventId => {
+                const key = `bm:${eventId}`;
+                const lastRun = lastRunTimes.get(key) || 0;
+                const jitter = Math.floor(Math.random() * 100) - 50; 
+                return (now - lastRun) >= (PULSE_BOOKMAKER + jitter);
+            }).slice(0, 10);
 
-            // 2. Sync Full Markets (Match Odds)
-            const marketPromises = limitedMarketPairs.map(([eventId, marketId]) => 
-                fetchAndCacheFullMarkets(eventId, marketId, true).catch(e => console.error(`❌ [SYNC_MARKET] Error ${marketId}:`, e.message))
-            );
+            dueBookmakers.forEach(eventId => {
+                lastRunTimes.set(`bm:${eventId}`, now);
+                syncTasks.push(fetchAndCacheBookmaker(eventId, true));
+            });
 
-            // Execute all sync tasks in parallel
-            await Promise.allSettled([...fancyPromises, ...bookmakerPromises, ...marketPromises]);
+            // 3. FANCY PULSE (Standard)
+            const dueFancy = eventIds.filter(eventId => {
+                const key = `fancy:${eventId}`;
+                const lastRun = lastRunTimes.get(key) || 0;
+                const jitter = Math.floor(Math.random() * 100) - 50; 
+                return (now - lastRun) >= (PULSE_FANCY + jitter);
+            }).slice(0, 10);
 
-            const duration = Date.now() - startTime;
-            const remainingDelay = Math.max(0, SYNC_INTERVAL_MS - duration);
-            
-            await new Promise(resolve => setTimeout(resolve, remainingDelay));
+            dueFancy.forEach(eventId => {
+                lastRunTimes.set(`fancy:${eventId}`, now);
+                syncTasks.push(getFancyOdds(eventId, true));
+            });
+
+            // Parallel Execution
+            if (syncTasks.length > 0) {
+                console.log(`🔄 [SYNC] Pulse: ${syncTasks.length} tasks matching due times.`);
+                Promise.allSettled(syncTasks); // We don't 'await' to keep the loop ticking fast
+            }
+
+            // Small master tick to keep CPU usage low
+            await new Promise(resolve => setTimeout(resolve, SYNC_LOOP_TICK));
+
+            // Clean up stale lastRunTimes (older than 1 minute)
+            if (now % 60000 < 500) {
+                 for (const [key, time] of lastRunTimes) {
+                     if (now - time > 60000) lastRunTimes.delete(key);
+                 }
+            }
 
         } catch (error) {
-            console.error('❌ [SYNC_INTERVAL_ERROR]:', error.message);
-            await new Promise(resolve => setTimeout(resolve, SYNC_INTERVAL_MS));
+            console.error('❌ [SYNC_TICK_ERROR]:', error.message);
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
 }
