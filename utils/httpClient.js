@@ -3,11 +3,9 @@ const http = require('http');
 const https = require('https');
 
 // 🚀 Highly optimized Agents for Keep-Alive
-// This avoids expensive TCP handshakes on every request, 
-// saving ~100-200ms of latency per poll.
 const httpAgent = new http.Agent({
     keepAlive: true,
-    maxSockets: 200, // Handle high concurrency
+    maxSockets: 200,
     maxFreeSockets: 20,
     timeout: 30000,
     freeSocketTimeout: 15000,
@@ -19,8 +17,6 @@ const httpsAgent = new https.Agent({
     maxFreeSockets: 20,
     timeout: 30000,
     freeSocketTimeout: 15000,
-    // 🕵️ Expert TLS Stealth: Mimic Chrome's Cipher Suite
-    // This helps bypass JA3 fingerprinting used by anti-bot systems.
     ciphers: [
         'TLS_AES_256_GCM_SHA384',
         'TLS_CHACHA20_POLY1305_SHA256',
@@ -37,26 +33,29 @@ const httpsAgent = new https.Agent({
 });
 
 /**
- * Creates a pre-configured Axios instance for the betting API.
- * Includes stealth headers and optimized timeout settings.
+ * 🕵️ Expert Level Browser Headers (Mobile Emulation)
+ * Based on the user's DH88 Request screenshot.
  */
+const DEFAULT_HEADERS = {
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'en-IN,en-GB;q=0.9,en-US;q=0.8',
+    'Connection': 'keep-alive',
+    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1',
+    'sec-ch-ua': '"Chromium";v="146", "Not:A-Brand";v="24", "Google Chrome";v="146"',
+    'sec-ch-ua-mobile': '?1',
+    'sec-ch-ua-platform': '"iOS"',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-site',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Source': '1'
+};
+
 const httpClient = axios.create({
     httpAgent,
     httpsAgent,
-    timeout: 8000, // Slightly longer timeout for resilience
-    headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Connection': 'keep-alive',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-        'sec-ch-ua': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-site',
-        'X-Requested-With': 'XMLHttpRequest'
-    }
+    timeout: 10000,
+    headers: DEFAULT_HEADERS
 });
 
 module.exports = httpClient;

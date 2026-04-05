@@ -3,8 +3,9 @@ const httpClient = require('../utils/httpClient');
 const { getNextProxy, parseProxy } = require('./proxy.service');
 const { getCookie, generateCookie } = require('../controllers/cookie.controller');
 const { login } = require('../controllers/auth.controller');
+const { DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
 
-const FANCY_API_URL = "https://bkqawscf.gu21go76.xyz/exchange/member/playerService/queryFancyBetMarkets";
+const FANCY_API_URL = "https://bxawscf.gu21go76.xyz/exchange/member/playerService/queryFancyBetMarkets";
 
 // 🚀 L1 MEMORY CACHE
 const L1_CACHE = new Map();
@@ -15,9 +16,7 @@ async function getFancyOdds(eventId, retry = true) {
 
     // 🏎️ 1. Try L1 Memory Cache First
     const l1Entry = L1_CACHE.get(cacheKey);
-    if (l1Entry && l1Entry.expiry > Date.now()) {
-        return l1Entry.data;
-    }
+    if (l1Entry && l1Entry.expiry > Date.now()) return l1Entry.data;
 
     try {
         const cookie = getCookie();
@@ -26,7 +25,9 @@ async function getFancyOdds(eventId, retry = true) {
         const queryPass = cookie.split("JSESSIONID=")[1]?.split(";")[0];
         if (!queryPass) throw new Error("INVALID_COOKIE_FORMAT");
 
+        // 🕵️ Expert URL Refactor: semicolon jsessionid
         const exactUrl = `${FANCY_API_URL};jsessionid=${queryPass}`;
+
         const payload = new URLSearchParams({
             eventId: String(eventId),
             version: "0",
@@ -41,30 +42,26 @@ async function getFancyOdds(eventId, retry = true) {
             headers: {
                 "Authorization": queryPass,
                 "Cookie": cookie,
-                "Host": "bkqawscf.gu21go76.xyz",
-                "Origin": "https://www.gu21go76.xyz",
-                "Referer": "https://www.gu21go76.xyz/",
+                "Origin": DEFAULT_ORIGIN,
+                "Referer": DEFAULT_REFERER,
                 "X-Requested-With": "XMLHttpRequest",
-                "source": "1"
-            }
+                "Source": "1"
+            },
+            validateStatus: (status) => status >= 200 && status < 500
         };
 
         if (proxyUrl) config.proxy = parseProxy(proxyUrl);
 
         const res = await httpClient.post(exactUrl, payload, config);
 
-        if (res.status === 410 || (res.data && res.data.message === "You have logged out!! Please login and try again!!") || (typeof res.data === 'string' && res.data.includes("You have logged out!!"))) {
+        if (res.status === 410 || (res.data && res.data.message === "You have logged out!! Please login and try again!!")) {
             throw new Error("NOT_AUTHORIZED");
         }
 
         if (res.data) {
-            // Update L1
             L1_CACHE.set(cacheKey, { data: res.data, expiry: Date.now() + L1_TTL });
-            
-            // Update Redis L2
             await redisClient.set(cacheKey, JSON.stringify(res.data), { EX: 2 });
             console.log(`✅ [FANCY] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
-            
             return res.data;
         }
 
@@ -73,7 +70,6 @@ async function getFancyOdds(eventId, retry = true) {
             try {
                 const token = await login();
                 await generateCookie(token);
-                // 🚀 Expert Buffer: Allow session to propagate (200ms)
                 await new Promise(r => setTimeout(r, 200));
                 return await getFancyOdds(eventId, false);
             } catch (e) {}

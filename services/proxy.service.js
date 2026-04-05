@@ -1,37 +1,45 @@
-/**
- * 🕵️ Proxy Management Service
- * Rotates between an array of residential or mobile proxies to prevent IP bans.
- * Update PROXY_LIST under environment variables for production.
- */
-let proxyIndex = 0;
+require('dotenv').config();
+
 const PROXY_LIST = process.env.PROXY_LIST ? process.env.PROXY_LIST.split(',') : [];
+let proxyIndex = 0;
 
 /**
- * Returns a proxy URL for the next request.
- * Implements round-robin rotation.
- * @returns {string|null} - Proxy URL or null if no proxies defined.
+ * Filter out placeholder proxies that cause ECONNREFUSED ::1
  */
+const VALID_PROXIES = PROXY_LIST.filter(p => 
+    p.trim() !== "" && 
+    !p.includes("host1") && 
+    !p.includes("port") && 
+    p.startsWith("http")
+);
+
 function getNextProxy() {
-    if (PROXY_LIST.length === 0) return null;
-    
-    const proxy = PROXY_LIST[proxyIndex];
-    proxyIndex = (proxyIndex + 1) % PROXY_LIST.length;
-    
+    if (VALID_PROXIES.length === 0) return null;
+    const proxy = VALID_PROXIES[proxyIndex];
+    proxyIndex = (proxyIndex + 1) % VALID_PROXIES.length;
     return proxy;
 }
 
 /**
- * Formats a proxy string into an Axios-compatible object or string.
- * Supports protocols like http, https, and socks5.
- * @param {string} proxyStr - Proxy string (e.g. http://user:pass@host:port)
+ * Parses proxy string into Axios compatible object
+ * @param {string} proxyUrl - Example: http://user:pass@host:port
  */
-function parseProxy(proxyStr) {
-    if (!proxyStr) return null;
-    return proxyStr; // Standard Axios proxy format
+function parseProxy(proxyUrl) {
+    try {
+        const url = new URL(proxyUrl);
+        return {
+            protocol: url.protocol.replace(':', ''),
+            host: url.hostname,
+            port: parseInt(url.port),
+            auth: {
+                username: url.username,
+                password: url.password
+            }
+        };
+    } catch (e) {
+        console.error("❌ Invalid Proxy URL:", proxyUrl);
+        return null;
+    }
 }
 
-module.exports = {
-    getNextProxy,
-    parseProxy,
-    count: PROXY_LIST.length
-};
+module.exports = { getNextProxy, parseProxy };
