@@ -1,7 +1,8 @@
 const axios = require('axios');
 const redisClient = require('../utils/redis');
+const httpClient = require('../utils/httpClient');
 const { getCookie } = require('../controllers/cookie.controller');
-const { EVENTS_API } = require('../config/config');
+const { EVENTS_API, DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
 
 const CACHE_KEYS = {
     INPLAY: 'events:inplay',
@@ -27,6 +28,9 @@ async function fetchAndCacheEvents(type) {
             return null;
         }
 
+        // 🕵️ Expert URL Refactor: semicolon jsessionid
+        const exactUrl = `${EVENTS_API};jsessionid=${queryPass}`;
+
         const body = new URLSearchParams({
             type: type, // 'inplay', 'today', 'tomorrow'
             eventType: "-1",
@@ -37,18 +41,17 @@ async function fetchAndCacheEvents(type) {
             queryPass: queryPass
         }).toString();
 
-        const res = await axios.post(EVENTS_API, body, {
+        const res = await httpClient.post(exactUrl, body, {
             headers: {
-                "Host": "bxawscf.skyinplay.com",
-                "Accept": "application/json, text/javascript, */*; q=0.01",
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "Origin": "https://bxawscf.skyinplay.com",
-                "Referer": `https://bxawscf.skyinplay.com/exchange/member/${type}`,
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                "Authorization": queryPass,
+                "Origin": DEFAULT_ORIGIN,
+                "Referer": DEFAULT_REFERER,
                 "X-Requested-With": "XMLHttpRequest",
-                "Cookie": cookie
+                "Cookie": cookie,
+                "Source": "1"
             },
-            timeout: 20000
+            timeout: 20000,
+            validateStatus: (status) => status >= 200 && status < 505
         });
 
         if (res.data) {

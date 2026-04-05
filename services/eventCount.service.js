@@ -1,7 +1,8 @@
 const axios = require('axios');
 const redisClient = require('../utils/redis');
+const httpClient = require('../utils/httpClient');
 const { getCookie } = require('../controllers/cookie.controller');
-const { LIVE_EVENT_COUNT_API } = require('../config/config');
+const { LIVE_EVENT_COUNT_API, DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
 
 const CACHE_KEY = 'live_event_counts';
 
@@ -15,25 +16,30 @@ async function fetchAndSaveEventCounts() {
             return null;
         }
 
-        // Extract JSESSIONID for the URL parameter if needed, or just use the cookie header
-        let jsessionid = cookie.split('JSESSIONID=')[1]?.split(';')[0];
-        const apiUrl = jsessionid ? `${LIVE_EVENT_COUNT_API};jsessionid=${jsessionid}` : LIVE_EVENT_COUNT_API;
+        const jsessionid = cookie.split('JSESSIONID=')[1]?.split(';')[0];
+        if (!jsessionid) {
+            console.log('⚠️ Invalid cookie format, skipping event count fetch');
+            return null;
+        }
 
-        const response = await axios.get(apiUrl, {
+        // 🕵️ Expert URL Refactor: semicolon jsessionid
+        const apiUrl = `${LIVE_EVENT_COUNT_API};jsessionid=${jsessionid}`;
+
+        const res = await httpClient.get(apiUrl, {
             headers: {
-                'Cookie': cookie,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'application/json, text/plain, */*',
-                'Origin': 'https://www.gugobet.net',
-                'Referer': 'https://www.gugobet.net/'
+                "Authorization": jsessionid,
+                "Cookie": cookie,
+                "Origin": DEFAULT_ORIGIN,
+                "Referer": DEFAULT_REFERER,
+                "Source": "1"
             },
-            timeout: 10000
+            timeout: 15000,
+            validateStatus: (status) => status >= 200 && status < 505
         });
 
-        const data = response.data;
+        const data = res.data;
 
         if (data) {
-            // Save to Redis (no TTL since cron updates it, or maybe a 10 min safety TTL)
             await redisClient.set(CACHE_KEY, JSON.stringify(data), {
                 EX: 600 // 10 minutes safety TTL
             });

@@ -1,8 +1,9 @@
 const axios = require('axios');
 const redisClient = require('../utils/redis');
+const httpClient = require('../utils/httpClient');
 const { getCookie, generateCookie } = require('../controllers/cookie.controller');
 const { login } = require('../controllers/auth.controller');
-const { SPORT_EVENTS_API } = require('../config/config');
+const { SPORT_EVENTS_API, DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
 
 const CACHE_KEY_PREFIX = 'sport_events:';
 
@@ -22,6 +23,9 @@ async function fetchAndCacheSportEvents(sportId, retry = true) {
             throw new Error("INVALID_COOKIE_FORMAT");
         }
 
+        // 🕵️ Expert URL Refactor: semicolon jsessionid
+        const exactUrl = `${SPORT_EVENTS_API};jsessionid=${queryPass}`;
+
         const body = new URLSearchParams({
             eventType: String(sportId),
             eventTs: "-1",
@@ -31,19 +35,17 @@ async function fetchAndCacheSportEvents(sportId, retry = true) {
             queryPass: queryPass
         }).toString();
 
-        const res = await axios.post(SPORT_EVENTS_API, body, {
+        const res = await httpClient.post(exactUrl, body, {
             headers: {
-                "Host": "saapipl.gu21go76.xyz",
-                "Accept": "application/json, text/javascript, */*; q=0.01",
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "Origin": "https://bxawscf.skyinplay.com",
-                "Referer": "https://bxawscf.skyinplay.com/",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                "Authorization": queryPass,
+                "Origin": DEFAULT_ORIGIN,
+                "Referer": DEFAULT_REFERER,
                 "X-Requested-With": "XMLHttpRequest",
-                "Cookie": cookie
+                "Cookie": cookie,
+                "Source": "1"
             },
             timeout: 20000,
-            validateStatus: (status) => status >= 200 && status < 500
+            validateStatus: (status) => status >= 200 && status < 505
         });
 
         if (res.status === 410 || (res.data && res.data.message === "You have logged out!! Please login and try again!!")) {
@@ -73,6 +75,8 @@ async function fetchAndCacheSportEvents(sportId, retry = true) {
             try {
                 const token = await login();
                 await generateCookie(token);
+                // 🚀 Propagation delay for listing API too
+                await new Promise(r => setTimeout(r, 200));
                 return await fetchAndCacheSportEvents(sportId, false);
             } catch (retryErr) {
                 console.error("❌ Self-healing failed for sport events:", retryErr.message);
