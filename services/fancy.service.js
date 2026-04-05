@@ -35,6 +35,8 @@ async function getFancyOdds(eventId, retry = true) {
         }).toString();
 
         const proxyUrl = getNextProxy();
+        console.log(`📡 [FANCY] Fetching fresh data for Event: ${eventId}`);
+
         const config = {
             headers: {
                 "Authorization": queryPass,
@@ -42,6 +44,7 @@ async function getFancyOdds(eventId, retry = true) {
                 "Host": "bkqawscf.gu21go76.xyz",
                 "Origin": "https://www.gu21go76.xyz",
                 "Referer": "https://www.gu21go76.xyz/",
+                "X-Requested-With": "XMLHttpRequest",
                 "source": "1"
             }
         };
@@ -60,6 +63,7 @@ async function getFancyOdds(eventId, retry = true) {
             
             // Update Redis L2
             await redisClient.set(cacheKey, JSON.stringify(res.data), { EX: 2 });
+            console.log(`✅ [FANCY] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
             
             return res.data;
         }
@@ -69,6 +73,8 @@ async function getFancyOdds(eventId, retry = true) {
             try {
                 const token = await login();
                 await generateCookie(token);
+                // 🚀 Expert Buffer: Allow session to propagate (200ms)
+                await new Promise(r => setTimeout(r, 200));
                 return await getFancyOdds(eventId, false);
             } catch (e) {}
         }

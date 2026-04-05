@@ -33,12 +33,16 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
 
         // 🕵️ Get Next Proxy for Rotation
         const proxyUrl = getNextProxy();
+        console.log(`📡 [FULL_MARKETS] Fetching fresh data for Market: ${marketId} (Event: ${eventId})`);
+        
         const config = {
             headers: {
                 "Host": "saapipl.gu21go76.xyz",
                 "Origin": "https://bxawscf.skyinplay.com",
                 "Referer": "https://bxawscf.skyinplay.com/",
-                "Cookie": cookie
+                "Cookie": cookie,
+                "X-Requested-With": "XMLHttpRequest",
+                "source": "1"
             },
             validateStatus: (status) => status >= 200 && status < 500
         };
@@ -64,6 +68,7 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
 
             // 2. Update Redis L2 Cache (Distributed)
             await redisClient.set(cacheKey, JSON.stringify(res.data), { EX: 2 });
+            console.log(`✅ [FULL_MARKETS] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
 
             return res.data;
         }
@@ -71,9 +76,11 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
     } catch (error) {
         // ... (Error handling remains same but with self-healing)
         if (retry && (error.message === "NOT_AUTHORIZED" || error.message === "COOKIE_NOT_READY")) {
-             try {
+            try {
                 const token = await login();
                 await generateCookie(token);
+                // 🚀 Expert Buffer: Allow session to propagate (200ms)
+                await new Promise(r => setTimeout(r, 200));
                 return await fetchAndCacheFullMarkets(eventId, marketId, false);
             } catch (e) {}
         }

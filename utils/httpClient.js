@@ -7,16 +7,16 @@ const https = require('https');
 // saving ~100-200ms of latency per poll.
 const httpAgent = new http.Agent({
     keepAlive: true,
-    maxSockets: 100, // Handle high concurrency
-    maxFreeSockets: 10,
+    maxSockets: 200, // Handle high concurrency
+    maxFreeSockets: 20,
     timeout: 30000,
     freeSocketTimeout: 15000,
 });
 
 const httpsAgent = new https.Agent({
     keepAlive: true,
-    maxSockets: 100,
-    maxFreeSockets: 10,
+    maxSockets: 200,
+    maxFreeSockets: 20,
     timeout: 30000,
     freeSocketTimeout: 15000,
     // 🕵️ Expert TLS Stealth: Mimic Chrome's Cipher Suite
@@ -43,12 +43,18 @@ const httpsAgent = new https.Agent({
 const httpClient = axios.create({
     httpAgent,
     httpsAgent,
-    timeout: 5000, // Short timeout for low-latency updates
+    timeout: 8000, // Slightly longer timeout for resilience
     headers: {
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Accept': 'application/json, text/plain, */*',
         'Accept-Language': 'en-US,en;q=0.9',
         'Connection': 'keep-alive',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+        'sec-ch-ua': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-site',
         'X-Requested-With': 'XMLHttpRequest'
     }
 });

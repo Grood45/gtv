@@ -29,13 +29,18 @@ async function fetchAndCacheBookmaker(eventId, retry = true) {
         }).toString();
 
         const proxyUrl = getNextProxy();
+        console.log(`📡 [BOOKMAKER] Fetching fresh data for Event: ${eventId}`);
+
         const config = {
             headers: {
                 "Host": "saapipl.gu21go76.xyz",
                 "Origin": "https://bxawscf.skyinplay.com",
                 "Referer": "https://bxawscf.skyinplay.com/",
-                "Cookie": cookie
-            }
+                "Cookie": cookie,
+                "X-Requested-With": "XMLHttpRequest",
+                "source": "1"
+            },
+            validateStatus: (status) => status >= 200 && status < 500
         };
 
         if (proxyUrl) config.proxy = parseProxy(proxyUrl);
@@ -54,6 +59,7 @@ async function fetchAndCacheBookmaker(eventId, retry = true) {
 
             // 2. Update Redis L2
             await redisClient.set(cacheKey, JSON.stringify(res.data), { EX: 2 });
+            console.log(`✅ [BOOKMAKER] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
             
             return res.data;
         }
@@ -63,6 +69,8 @@ async function fetchAndCacheBookmaker(eventId, retry = true) {
             try {
                 const token = await login();
                 await generateCookie(token);
+                // 🚀 Expert Buffer: Allow session to propagate (200ms)
+                await new Promise(r => setTimeout(r, 200));
                 return await fetchAndCacheBookmaker(eventId, false);
             } catch (e) {}
         }
