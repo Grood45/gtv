@@ -5,3 +5,23 @@ temp-npm-cache/
 logs/
 app.log
 package-lock.json
+test-config.js
+
+# Data & Session
+storage/*.json
+live_odds.json
+local_odds.json
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

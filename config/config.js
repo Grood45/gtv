@@ -1,5 +1,7 @@
+require("dotenv").config();
+
 module.exports = {
-  PORT: 4000,
+  PORT: process.env.PORT || 4000,
 
   LOGIN_URL: "https://api.gugobet.net/api/v1/member/login",
 
@@ -29,8 +31,8 @@ module.exports = {
   DEFAULT_REFERER: "https://www.gu21go76.xyz/",
 
   AUTH: {
-    account_id: "7895289296",
-    password: "Sher@123",
-    country_code: "91",
+    account_id: process.env.AUTH_ACCOUNT_ID,
+    password: process.env.AUTH_PASSWORD,
+    country_code: process.env.AUTH_COUNTRY_CODE,
   },
 };
