@@ -179,6 +179,6 @@ const connectDB = require("./config/db");
 })();
 
 // ================= START SERVER =================
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", 2048, () => {
   console.log(`🚀 GLIVE RUNNING ON PORT ${PORT}`);
 });
