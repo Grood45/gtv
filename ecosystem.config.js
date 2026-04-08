@@ -3,10 +3,11 @@ module.exports = {
         {
             name: "glivestreeming",
             script: "./server.js",
-            instances: -1, // Use all CPU cores EXCEPT one (Safe for shared servers)
-            exec_mode: "cluster", // Enable load balancing
-            watch: false, // Don't watch files in production (use specialized tools or CI/CD)
-            max_memory_restart: "500M", // Auto-restart if memory leaks
+            instances: 1, // Stable single instance
+            exec_mode: "fork", // Use fork mode for single instance stability
+            watch: false,
+            max_memory_restart: "1G",
+            node_args: "--max-old-space-size=1024", // Give Node.js 1GB Heap
             env: {
                 NODE_ENV: "production",
             },

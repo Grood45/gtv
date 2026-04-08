@@ -2,6 +2,7 @@ const express = require("express");
 const { PORT } = require("./config/config");
 const { login, loadToken } = require("./controllers/auth.controller");
 const { generateCookie, loadCookie } = require("./controllers/cookie.controller");
+const Event = require("./models/Event"); // ✅ Fix missing model
 
 // 🔹 Start cron jobs (auth + cookie)
 require("./cron/cookie.cron");
@@ -54,7 +55,7 @@ const limiter = rateLimit({
   message: "Too many requests, please try again after a minute.",
   skip: (req) => req.path.startsWith("/nw/v1") // 🟢 UNLIMITED FOR OPTIMIZED CLIENT API
 });
-app.use(limiter);
+// app.use(limiter); // 🛡️ Temporarily disabled for debugging
 // ========================================================
 
 app.get("/", (req, res) => res.send("GLIVE SERVER IS RUNNING"));
