@@ -7,7 +7,7 @@ const { fetchAndCacheFullMarkets } = require('./fullMarkets.service');
 const PULSE_MATCH_ODDS = 350;    // 350ms for Match Odds
 const PULSE_BOOKMAKER = 1000;    // 1s for Bookmaker
 const PULSE_FANCY = 1000;        // 1s for Fancy
-const SYNC_LOOP_TICK = 100;      // 100ms master tick
+const SYNC_LOOP_TICK = 1000;      // 1000ms (1s) master tick for stability
 
 const MAX_CONCURRENT_MATCHES = 20; // Slightly higher for multi-pulse
 
@@ -82,7 +82,7 @@ async function startBackgroundSync() {
             // Parallel Execution
             if (syncTasks.length > 0) {
                 console.log(`🔄 [SYNC] Pulse: ${syncTasks.length} tasks matching due times.`);
-                Promise.allSettled(syncTasks); // We don't 'await' to keep the loop ticking fast
+                await Promise.allSettled(syncTasks); // 🚀 CRITICAL: We now AWAIT to prevent socket explosion
             }
 
             // Small master tick to keep CPU usage low
