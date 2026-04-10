@@ -26,6 +26,9 @@ module.exports = {
   FULL_MARKETS_API:
     "https://bxawscf.gu21go76.xyz/exchange/member/playerService/queryFullMarkets",
 
+  OCER_MENU_API:
+    "https://bxawscf.gu21go76.xyz/exchange/member/playerService/queryOcerMenu",
+
   // 🕵️ Expert Alignments
   DEFAULT_ORIGIN: "https://www.gu21go76.xyz",
   DEFAULT_REFERER: "https://www.gu21go76.xyz/",

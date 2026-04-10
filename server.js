@@ -10,6 +10,7 @@ require("./cron/inplay.cron");
 require("./cron/eventCount.cron");
 require("./cron/liveEvents.cron");
 require("./cron/sportEvents.cron");
+require("./cron/menu.cron");
 require("./cron/cleanup.cron");
 
 const { gliveHandler } = require("./controllers/glive.controller");
@@ -20,6 +21,7 @@ const liveEventsRoutes = require("./routes/liveEvents.routes");
 const sportEventsRoutes = require("./routes/sportEvents.routes");
 const bookmakerRoutes = require("./routes/bookmaker.routes");
 const fullMarketsRoutes = require("./routes/fullMarkets.routes");
+const menuRoutes = require("./routes/menu.routes");
 const { startBackgroundSync } = require("./services/sync.service");
 
 const app = express();
@@ -70,6 +72,7 @@ app.use("/nw/v1", liveEventsRoutes);
 app.use("/nw/v1/sport", sportEventsRoutes);
 app.use("/nw/v1/bookmaker", bookmakerRoutes);
 app.use("/nw/v1/fullMarkets", fullMarketsRoutes);
+app.use("/nw/v1", menuRoutes);
 
 const { getCookie } = require("./controllers/cookie.controller");
 const { getToken } = require("./controllers/auth.controller");
