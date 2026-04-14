@@ -9,11 +9,22 @@ const CACHE_KEY_PREFIX = 'full_markets:';
 const L1_CACHE = new Map();
 const L1_TTL = 800; // 800ms TTL
 
+// 🛡️ STAMPEDE LOCK (Mutex Map)
+const inFlightRequests = new Map();
+
 /**
  * Fetch Full Markets for a specific event ID and market ID and cache in Redis + L1
  */
 async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
-    try {
+    const lockKey = `${eventId}:${marketId}`;
+    
+    // 🛡️ 1. STAMPEDE LOCK: If an identical request is already mid-flight, await it instead of firing a 9Wicket request.
+    if (inFlightRequests.has(lockKey)) {
+        return inFlightRequests.get(lockKey);
+    }
+
+    const fetchPromise = (async () => {
+        try {
         const cookie = getCookie();
         if (!cookie) throw new Error("COOKIE_NOT_READY");
 
@@ -85,6 +96,18 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
         console.error(`❌ [FULL_MARKETS] Error ${eventId}:`, error.message);
     }
     return null;
+    })();
+
+    // Set the lock
+    inFlightRequests.set(lockKey, fetchPromise);
+    
+    try {
+        const result = await fetchPromise;
+        return result;
+    } finally {
+        // Clear the lock immediately after the promise resolves or rejects
+        inFlightRequests.delete(lockKey);
+    }
 }
 
 async function getCachedFullMarkets(eventId, marketId) {
@@ -96,12 +119,9 @@ async function getCachedFullMarkets(eventId, marketId) {
         const cachedData = await redisClient.get(cacheKey);
         if (cachedData) {
             const envelope = JSON.parse(cachedData);
-            if (envelope.savedAt && envelope.payload) {
-                if (Date.now() - envelope.savedAt < 2000) { // Fresh (< 2s)
-                    L1_CACHE.set(cacheKey, { data: envelope.payload, expiry: Date.now() + L1_TTL });
-                    return envelope.payload;
-                }
-                return null; // Return null so fetchAndCache triggers
+            if (envelope.payload) {
+                L1_CACHE.set(cacheKey, { data: envelope.payload, expiry: Date.now() + L1_TTL });
+                return envelope.payload; // Always return from cache, ignore age bounds to prevent stampede
             }
             L1_CACHE.set(cacheKey, { data: envelope, expiry: Date.now() + L1_TTL });
             return envelope; // Legacy fallback
