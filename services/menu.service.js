@@ -22,17 +22,17 @@ function getMenuContext(params) {
     
     // Level 4: Markets for Event
     if (eventId !== "-1") {
-        return { level: 'markets', key: `markets:${eventId}`, ttl: 120 }; // 2 Minutes
+        return { level: 'markets', key: `markets:${eventId}`, ttl: 86400 }; // 24 Hours Backup TTL
     }
 
     // Level 3: Events for Competition
     if (competitionId !== "-2") {
-        return { level: 'events', key: `events:${competitionId}`, ttl: 300 }; // 5 Minutes
+        return { level: 'events', key: `events:${competitionId}`, ttl: 86400 }; // 24 Hours Backup TTL
     }
 
     // Level 2: Competitions for Sport
     if (eventType !== "-1") {
-        return { level: 'competitions', key: `competitions:${eventType}`, ttl: 1800 }; // 30 Minutes
+        return { level: 'competitions', key: `competitions:${eventType}`, ttl: 86400 }; // 24 Hours Backup TTL
     }
 
     return { level: 'unknown', key: 'unknown', ttl: 60 };
@@ -71,7 +71,7 @@ async function coreFetch(params, retry = true) {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             },
             timeout: 20000,
-            validateStatus: (status) => status >= 200 && status < 505
+            validateStatus: (status) => status === 200
         });
 
         if (

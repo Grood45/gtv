@@ -51,13 +51,13 @@ async function fetchAndCacheEvents(type) {
                 "Source": "1"
             },
             timeout: 20000,
-            validateStatus: (status) => status >= 200 && status < 505
+            validateStatus: (status) => status === 200
         });
 
         if (res.data) {
             const cacheKey = CACHE_KEYS[type.toUpperCase()];
             await redisClient.set(cacheKey, JSON.stringify(res.data), {
-                EX: 600 // 10 minutes safety TTL
+                EX: 86400 // 24 Hours Backup TTL
             });
             console.log(`✅ [REDIS] Cached ${type} events`);
             return res.data;

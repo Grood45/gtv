@@ -41,7 +41,7 @@ async function fetchAndSaveEvents() {
                 "Source": "1"
             },
             timeout: 20000,
-            validateStatus: (status) => status >= 200 && status < 505
+            validateStatus: (status) => status === 200
         });
 
         const eventList = res.data?.events || [];

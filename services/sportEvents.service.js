@@ -45,7 +45,7 @@ async function fetchAndCacheSportEvents(sportId, retry = true) {
                 "Source": "1"
             },
             timeout: 20000,
-            validateStatus: (status) => status >= 200 && status < 505
+            validateStatus: (status) => status === 200
         });
 
         if (res.status === 410 || (res.data && res.data.message === "You have logged out!! Please login and try again!!")) {
@@ -55,7 +55,7 @@ async function fetchAndCacheSportEvents(sportId, retry = true) {
         if (res.data) {
             const cacheKey = `${CACHE_KEY_PREFIX}${sportId}`;
             await redisClient.set(cacheKey, JSON.stringify(res.data), {
-                EX: 600 // 10 minutes safety TTL
+                EX: 86400 // 24 Hours Backup TTL
             });
             console.log(`✅ [REDIS] Cached events for sport ID: ${sportId}`);
             return res.data;

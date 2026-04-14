@@ -18,6 +18,25 @@ async function getFancyOdds(eventId, retry = true) {
     const l1Entry = L1_CACHE.get(cacheKey);
     if (l1Entry && l1Entry.expiry > Date.now()) return l1Entry.data;
 
+    // 🏎️ 2. Read from Redis Envelope for Stale-If-Error Support
+    let staleData = null;
+    try {
+        const cachedStr = await redisClient.get(cacheKey);
+        if (cachedStr) {
+            const envelope = JSON.parse(cachedStr);
+            if (envelope.savedAt && envelope.payload) {
+                const age = Date.now() - envelope.savedAt;
+                if (age < 2000) { // Fresh (< 2 seconds)
+                    L1_CACHE.set(cacheKey, { data: envelope.payload, expiry: Date.now() + L1_TTL });
+                    return envelope.payload;
+                }
+                staleData = envelope.payload; // Stale (older than 2s), keep as fallback
+            } else {
+                staleData = envelope; // Legacy fallback
+            }
+        }
+    } catch(e) {}
+
     try {
         const cookie = getCookie();
         if (!cookie) throw new Error("COOKIE_NOT_READY");
@@ -47,7 +66,7 @@ async function getFancyOdds(eventId, retry = true) {
                 "X-Requested-With": "XMLHttpRequest",
                 "Source": "1"
             },
-            validateStatus: (status) => status >= 200 && status < 500
+            validateStatus: (status) => status === 200 || status === 410
         };
 
         if (proxyUrl) config.proxy = parseProxy(proxyUrl);
@@ -59,8 +78,9 @@ async function getFancyOdds(eventId, retry = true) {
         }
 
         if (res.data) {
+            const envelope = { savedAt: Date.now(), payload: res.data };
             L1_CACHE.set(cacheKey, { data: res.data, expiry: Date.now() + L1_TTL });
-            await redisClient.set(cacheKey, JSON.stringify(res.data), { EX: 2 });
+            await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 }); // 24H Backup Profile
             console.log(`✅ [FANCY] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
             return res.data;
         }
@@ -74,9 +94,16 @@ async function getFancyOdds(eventId, retry = true) {
                 return await getFancyOdds(eventId, false);
             } catch (e) {}
         }
+        
+        // STALE-IF-ERROR FALLBACK TRIGGER
+        if (staleData) {
+            console.log(`🛡️ [FANCY] API Failed (${error.message}). Returning STALE 24H Backup for Event: ${eventId}`);
+            return staleData;
+        }
+
         console.error(`❌ [FANCY] Error ${eventId}:`, error.message);
     }
-    return null;
+    return staleData || null;
 }
 
 module.exports = { getFancyOdds };

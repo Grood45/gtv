@@ -34,14 +34,14 @@ async function fetchAndSaveEventCounts() {
                 "Source": "1"
             },
             timeout: 15000,
-            validateStatus: (status) => status >= 200 && status < 505
+            validateStatus: (status) => status === 200
         });
 
         const data = res.data;
 
         if (data) {
             await redisClient.set(CACHE_KEY, JSON.stringify(data), {
-                EX: 600 // 10 minutes safety TTL
+                EX: 86400 // 24 Hours Backup TTL
             });
             console.log('✅ Live Event Counts updated in Redis');
             return data;
