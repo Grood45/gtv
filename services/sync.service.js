@@ -3,10 +3,10 @@ const { getFancyOdds } = require('./fancy.service');
 const { fetchAndCacheBookmaker } = require('./bookmaker.service');
 const { fetchAndCacheFullMarkets } = require('./fullMarkets.service');
 
-// 🚀 PULSE CONFIGURATION (Safe Interval Timing - Prevents 500 Nginx Blocks)
-const PULSE_MATCH_ODDS = 2500;   // 2.5s for Match Odds (Safe limit)
-const PULSE_BOOKMAKER = 4000;    // 4s for Bookmaker
-const PULSE_FANCY = 4000;        // 4s for Fancy
+// 🚀 PULSE CONFIGURATION (Expert Level Timing - High Performance)
+const PULSE_MATCH_ODDS = 500;   // 500ms for Match Odds (Real-time Feel)
+const PULSE_BOOKMAKER = 1000;    // 1s for Bookmaker
+const PULSE_FANCY = 1000;        // 1s for Fancy
 const SYNC_LOOP_TICK = 250;      // 250ms master tick (4 updates per second)
 
 const MAX_CONCURRENT_MATCHES = 20; // Slightly higher for multi-pulse
