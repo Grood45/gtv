@@ -30,7 +30,7 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
         }).toString();
 
         const proxyUrl = getNextProxy();
-        console.log(`📡 [FULL_MARKETS] Fetching fresh data for Market: ${marketId} (Event: ${eventId})`);
+        // console.log(`📡 [FULL_MARKETS] Fetching fresh data for Market: ${marketId} (Event: ${eventId})`);
         
         const config = {
             headers: {
@@ -57,7 +57,7 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
             const envelope = { savedAt: Date.now(), payload: res.data };
             L1_CACHE.set(cacheKey, { data: res.data, expiry: Date.now() + L1_TTL });
             await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 }); // 24H Backup Profile
-            console.log(`✅ [FULL_MARKETS] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
+            // console.log(`✅ [FULL_MARKETS] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
             return res.data;
         }
 

@@ -56,7 +56,7 @@ async function fetchAndCacheBookmaker(eventId, retry = true) {
             const envelope = { savedAt: Date.now(), payload: res.data };
             L1_CACHE.set(cacheKey, { data: res.data, expiry: Date.now() + L1_TTL });
             await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 }); // 24H Backup Profile
-            console.log(`✅ [BOOKMAKER] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
+            // console.log(`✅ [BOOKMAKER] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
             return res.data;
         }
 

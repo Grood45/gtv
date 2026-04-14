@@ -55,7 +55,7 @@ async function getFancyOdds(eventId, retry = true) {
         }).toString();
 
         const proxyUrl = getNextProxy();
-        console.log(`📡 [FANCY] Fetching fresh data for Event: ${eventId}`);
+        // console.log(`📡 [FANCY] Fetching fresh data for Event: ${eventId}`);
 
         const config = {
             headers: {
@@ -81,7 +81,7 @@ async function getFancyOdds(eventId, retry = true) {
             const envelope = { savedAt: Date.now(), payload: res.data };
             L1_CACHE.set(cacheKey, { data: res.data, expiry: Date.now() + L1_TTL });
             await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 }); // 24H Backup Profile
-            console.log(`✅ [FANCY] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
+            // console.log(`✅ [FANCY] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
             return res.data;
         }
 
