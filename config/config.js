@@ -29,6 +29,12 @@ module.exports = {
   OCER_MENU_API:
     "https://bxawscf.gu21go76.xyz/exchange/member/playerService/queryOcerMenu",
 
+  FANCY_RESULT_API:
+    "https://bxawscf.gu21go76.xyz/member/reportController/queryMarketListForResultPage",
+
+  EVENT_RESULTS_API:
+    "https://bxawscf.gu21go76.xyz/member/reportController/queryEventResults",
+
   // 🕵️ Expert Alignments
   DEFAULT_ORIGIN: "https://www.gu21go76.xyz",
   DEFAULT_REFERER: "https://www.gu21go76.xyz/",
