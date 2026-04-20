@@ -64,7 +64,7 @@ async function generateCookie() {
 
     await SystemConfig.findOneAndUpdate(
       { key: "COOKIE" },
-      { value: { value: jsessionValue } },
+      { value: { value: jsessionValue }, updatedAt: new Date() },
       { upsert: true }
     );
 

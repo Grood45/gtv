@@ -37,7 +37,7 @@ async function login() {
     // 💾 SAVE TO MONGODB
     await SystemConfig.findOneAndUpdate(
       { key: "AUTH_TOKEN" },
-      { value: { token, usernameToken } },
+      { value: { token, usernameToken }, updatedAt: new Date() },
       { upsert: true, returnDocument: 'after' }
     );
 

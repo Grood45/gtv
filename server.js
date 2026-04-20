@@ -76,8 +76,37 @@ app.use("/nw/v1/fullMarkets", fullMarketsRoutes);
 app.use("/nw/v1", menuRoutes);
 app.use("/nw/v1/result", resultRoutes);
 
+const SystemConfig = require("./models/SystemConfig");
 const { getCookie } = require("./controllers/cookie.controller");
 const { getTokens } = require("./controllers/auth.controller");
+
+// 🕒 Time Formatter Helper
+function formatTimeInfo(date) {
+  if (!date) return { full: "NEVER", relative: "N/A" };
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, '0');
+  const mins = String(d.getMinutes()).padStart(2, '0');
+  const secs = String(d.getSeconds()).padStart(2, '0');
+  
+  const full = `${day}-${month}-${year} ${hours}:${mins}:${secs}`;
+  
+  const diffMs = Date.now() - d.getTime();
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  
+  let relative = "";
+  if (diffSecs < 60) relative = `${diffSecs} seconds ago`;
+  else if (diffMins < 60) relative = `${diffMins} minutes ago`;
+  else if (diffHours < 24) relative = `${diffHours} hours ago`;
+  else relative = `${diffDays} days ago`;
+  
+  return { full, relative };
+}
 
 
 
@@ -131,14 +160,34 @@ app.get("/test", (req, res) => {
     `);
 });
 
-app.get("/debug/status", (req, res) => {
-  const tokens = getTokens();
-  res.json({
-    cookie: getCookie() ? "READY" : "MISSING",
-    token: tokens.token ? "READY" : "MISSING",
-    usernameToken: tokens.usernameToken ? "READY" : "MISSING",
-    env: process.env.NODE_ENV || "development"
-  });
+app.get("/debug/status", async (req, res) => {
+  try {
+    const [tokenDoc, cookieDoc] = await Promise.all([
+      SystemConfig.findOne({ key: "AUTH_TOKEN" }),
+      SystemConfig.findOne({ key: "COOKIE" })
+    ]);
+
+    const tokens = getTokens();
+    const tokenTime = formatTimeInfo(tokenDoc?.updatedAt);
+    const cookieTime = formatTimeInfo(cookieDoc?.updatedAt);
+
+    res.json({
+      env: process.env.NODE_ENV || "development",
+      auth: {
+        token_status: tokens.token ? "READY" : "MISSING",
+        username_token_status: tokens.usernameToken ? "READY" : "MISSING",
+        updated_at: tokenTime.full,
+        relative_time: tokenTime.relative
+      },
+      session: {
+        cookie_status: getCookie() ? "READY" : "MISSING",
+        updated_at: cookieTime.full,
+        relative_time: cookieTime.relative
+      }
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get("/debug/events", async (req, res) => {
