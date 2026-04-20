@@ -1,6 +1,5 @@
 const axios = require('axios');
 const redisClient = require('../utils/redis');
-const httpClient = require('../utils/httpClient');
 const { getCookie } = require('../controllers/cookie.controller');
 const { LIVE_EVENT_COUNT_API, DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
 
@@ -22,16 +21,19 @@ async function fetchAndSaveEventCounts() {
             return null;
         }
 
-        // 🕵️ Expert URL Refactor: semicolon jsessionid
-        const apiUrl = `${LIVE_EVENT_COUNT_API};jsessionid=${jsessionid}`;
+        // Clean URL (no semicolon for Bigwin compatibility)
+        const apiUrl = LIVE_EVENT_COUNT_API;
 
-        const res = await httpClient.get(apiUrl, {
+        const res = await axios.get(apiUrl, {
             headers: {
+                "Accept": "application/json, text/plain, */*",
                 "Authorization": jsessionid,
                 "Cookie": cookie,
                 "Origin": DEFAULT_ORIGIN,
                 "Referer": DEFAULT_REFERER,
-                "Source": "1"
+                "Source": "1",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+                "X-Requested-With": "XMLHttpRequest"
             },
             timeout: 15000,
             validateStatus: (status) => status === 200

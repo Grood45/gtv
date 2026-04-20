@@ -1,6 +1,5 @@
 const axios = require('axios');
 const redisClient = require('../utils/redis');
-const httpClient = require('../utils/httpClient');
 const { getCookie } = require('../controllers/cookie.controller');
 const { EVENTS_API, DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
 
@@ -28,8 +27,8 @@ async function fetchAndCacheEvents(type) {
             return null;
         }
 
-        // 🕵️ Expert URL Refactor: semicolon jsessionid
-        const exactUrl = `${EVENTS_API};jsessionid=${queryPass}`;
+        // Clean URL (no semicolon for Bigwin compatibility)
+        const exactUrl = EVENTS_API;
 
         const body = new URLSearchParams({
             type: type, // 'inplay', 'today', 'tomorrow'
@@ -41,14 +40,17 @@ async function fetchAndCacheEvents(type) {
             queryPass: queryPass
         }).toString();
 
-        const res = await httpClient.post(exactUrl, body, {
+        const res = await axios.post(exactUrl, body, {
             headers: {
+                "Accept": "application/json, text/plain, */*",
                 "Authorization": queryPass,
                 "Origin": DEFAULT_ORIGIN,
                 "Referer": DEFAULT_REFERER,
                 "X-Requested-With": "XMLHttpRequest",
                 "Cookie": cookie,
-                "Source": "1"
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Source": "1",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
             },
             timeout: 20000,
             validateStatus: (status) => status === 200

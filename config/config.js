@@ -3,10 +3,9 @@ require("dotenv").config();
 module.exports = {
   PORT: process.env.PORT || 4000,
 
-  LOGIN_URL: "https://api.gugobet.net/api/v1/member/login",
+  LOGIN_URL: "https://bigwin.live/api/user/user-login",
 
-  GAME_API:
-    "https://api.gugobet.net/api/v2/game/getGameUrl?game_code=4%40sport&platform_name=ninew3&mobile=1&category=sports&icon_key=1973",
+  BIGWIN_KEY_URL: "https://bigwin.live/api/sport/get-key-and-login",
 
   STREAM_API:
     "https://bkqawscf.gu21go76.xyz/exchange/member/playerService/getStreamingUrl",
@@ -36,12 +35,13 @@ module.exports = {
     "https://bxawscf.gu21go76.xyz/member/reportController/queryEventResults",
 
   // 🕵️ Expert Alignments
-  DEFAULT_ORIGIN: "https://www.gu21go76.xyz",
-  DEFAULT_REFERER: "https://www.gu21go76.xyz/",
+  // 🕵️ Expert Alignments
+  DEFAULT_ORIGIN: "https://bigwin.live",
+  DEFAULT_REFERER: "https://bigwin.live/",
 
   AUTH: {
-    account_id: process.env.AUTH_ACCOUNT_ID,
+    username: process.env.AUTH_ACCOUNT_ID,
     password: process.env.AUTH_PASSWORD,
-    country_code: process.env.AUTH_COUNTRY_CODE,
+    site_auth_key: process.env.SITE_AUTH_KEY || "BspAuthKey123",
   },
 };

@@ -1,6 +1,5 @@
+const axios = require('axios');
 const redisClient = require('../utils/redis');
-const httpClient = require('../utils/httpClient');
-const { getNextProxy, parseProxy } = require('./proxy.service');
 const { getCookie, generateCookie } = require('../controllers/cookie.controller');
 const { login } = require('../controllers/auth.controller');
 const { DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
@@ -59,7 +58,7 @@ async function getFancyOdds(eventId, retry = true, forceFetch = false) {
             const queryPass = cookie.split("JSESSIONID=")[1]?.split(";")[0];
             if (!queryPass) throw new Error("INVALID_COOKIE_FORMAT");
 
-            const exactUrl = `${FANCY_API_URL};jsessionid=${queryPass}`;
+            const exactUrl = FANCY_API_URL;
 
             const payload = new URLSearchParams({
                 eventId: String(eventId),
@@ -68,23 +67,22 @@ async function getFancyOdds(eventId, retry = true, forceFetch = false) {
                 selectionTs: "0"
             }).toString();
 
-            const proxyUrl = getNextProxy();
 
-            const config = {
+            const res = await axios.post(exactUrl, payload, {
                 headers: {
+                    "Accept": "application/json, text/plain, */*",
                     "Authorization": queryPass,
                     "Cookie": cookie,
+                    "Content-Type": "application/x-www-form-urlencoded",
                     "Origin": DEFAULT_ORIGIN,
                     "Referer": DEFAULT_REFERER,
                     "X-Requested-With": "XMLHttpRequest",
-                    "Source": "1"
+                    "Source": "1",
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
                 },
+                timeout: 15000,
                 validateStatus: (status) => status === 200 || status === 410
-            };
-
-            if (proxyUrl) config.proxy = parseProxy(proxyUrl);
-
-            const res = await httpClient.post(exactUrl, payload, config);
+            });
 
             if (res.status === 410 || (res.data && res.data.message === "You have logged out!! Please login and try again!!")) {
                 throw new Error("NOT_AUTHORIZED");
@@ -101,7 +99,7 @@ async function getFancyOdds(eventId, retry = true, forceFetch = false) {
             if (retry && (error.message === "NOT_AUTHORIZED" || error.message === "COOKIE_NOT_READY")) {
                 try {
                     const token = await login();
-                    await generateCookie(token);
+                    await generateCookie();
                     await new Promise(r => setTimeout(r, 200));
                     return await getFancyOdds(eventId, false, true);
                 } catch (e) {}

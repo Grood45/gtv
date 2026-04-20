@@ -1,6 +1,5 @@
 const axios = require('axios');
 const redisClient = require('../utils/redis');
-const httpClient = require('../utils/httpClient');
 const { getCookie, generateCookie } = require('../controllers/cookie.controller');
 const { login } = require('../controllers/auth.controller');
 const { SPORT_EVENTS_API, DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
@@ -23,8 +22,8 @@ async function fetchAndCacheSportEvents(sportId, retry = true) {
             throw new Error("INVALID_COOKIE_FORMAT");
         }
 
-        // 🕵️ Expert URL Refactor: semicolon jsessionid
-        const exactUrl = `${SPORT_EVENTS_API};jsessionid=${queryPass}`;
+        // Clean URL (no semicolon for Bigwin compatibility)
+        const exactUrl = SPORT_EVENTS_API;
 
         const body = new URLSearchParams({
             eventType: String(sportId),
@@ -35,14 +34,17 @@ async function fetchAndCacheSportEvents(sportId, retry = true) {
             queryPass: queryPass
         }).toString();
 
-        const res = await httpClient.post(exactUrl, body, {
+        const res = await axios.post(exactUrl, body, {
             headers: {
+                "Accept": "application/json, text/plain, */*",
                 "Authorization": queryPass,
                 "Origin": DEFAULT_ORIGIN,
                 "Referer": DEFAULT_REFERER,
                 "X-Requested-With": "XMLHttpRequest",
                 "Cookie": cookie,
-                "Source": "1"
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Source": "1",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
             },
             timeout: 20000,
             validateStatus: (status) => status === 200
@@ -74,8 +76,7 @@ async function fetchAndCacheSportEvents(sportId, retry = true) {
             console.log(`🚑 [SPORT_EVENTS] Self-healing activated for sport ${sportId}...`);
             try {
                 const token = await login();
-                await generateCookie(token);
-                // 🚀 Propagation delay for listing API too
+                await generateCookie();
                 await new Promise(r => setTimeout(r, 200));
                 return await fetchAndCacheSportEvents(sportId, false);
             } catch (retryErr) {

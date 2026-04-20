@@ -1,24 +1,23 @@
+const axios = require('axios');
 const redisClient = require('../utils/redis');
-const httpClient = require('../utils/httpClient');
-const { getNextProxy, parseProxy } = require('./proxy.service');
 const { getCookie, generateCookie } = require('../controllers/cookie.controller');
 const { login } = require('../controllers/auth.controller');
 const { BOOKMAKER_API, DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
 
 const CACHE_KEY_PREFIX = 'bookmaker:';
 const L1_CACHE = new Map();
-const L1_TTL = 1500; // 1.5s TTL for Bookmaker
+const L1_TTL = 1000; // 1s TTL for Bookmaker
 
 // 🛡️ STAMPEDE LOCK (Mutex Map)
 const inFlightRequests = new Map();
 
 /**
- * Fetch Bookmaker Markets for a specific event ID and cache in Redis + L1
+ * Fetch Bookmaker markets for a specific event ID and cache in Redis
  */
 async function fetchAndCacheBookmaker(eventId, retry = true) {
     const lockKey = String(eventId);
     
-    // 🛡️ 1. STAMPEDE LOCK: If an identical request is already mid-flight, await it instead of firing a 9Wicket request.
+    // 🛡️ 1. STAMPEDE LOCK
     if (inFlightRequests.has(lockKey)) {
         return inFlightRequests.get(lockKey);
     }
@@ -31,32 +30,29 @@ async function fetchAndCacheBookmaker(eventId, retry = true) {
         const queryPass = cookie.split("JSESSIONID=")[1]?.split(";")[0];
         if (!queryPass) throw new Error("INVALID_COOKIE_FORMAT");
 
-        // 🕵️ URL-based JSessionID for modern Cloudflare bypass
-        const exactUrl = `${BOOKMAKER_API};jsessionid=${queryPass}`;
+        const exactUrl = BOOKMAKER_API;
 
         const body = new URLSearchParams({
             eventId: String(eventId),
             queryPass: queryPass
         }).toString();
 
-        const proxyUrl = getNextProxy();
         console.log(`📡 [BOOKMAKER] Fetching fresh data for Event: ${eventId}`);
 
-        const config = {
+        const res = await axios.post(exactUrl, body, {
             headers: {
+                "Accept": "application/json, text/plain, */*",
                 "Authorization": queryPass,
                 "Cookie": cookie,
+                "Content-Type": "application/x-www-form-urlencoded",
                 "Origin": DEFAULT_ORIGIN,
                 "Referer": DEFAULT_REFERER,
                 "X-Requested-With": "XMLHttpRequest",
-                "Source": "1"
+                "Source": "1",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
             },
             validateStatus: (status) => status === 200 || status === 410
-        };
-
-        if (proxyUrl) config.proxy = parseProxy(proxyUrl);
-
-        const res = await httpClient.post(exactUrl, body, config);
+        });
 
         if (res.status === 410 || (res.data && res.data.message === "You have logged out!! Please login and try again!!")) {
             throw new Error("NOT_AUTHORIZED");
@@ -66,8 +62,7 @@ async function fetchAndCacheBookmaker(eventId, retry = true) {
             const cacheKey = `${CACHE_KEY_PREFIX}${eventId}`;
             const envelope = { savedAt: Date.now(), payload: res.data };
             L1_CACHE.set(cacheKey, { data: res.data, expiry: Date.now() + L1_TTL });
-            await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 }); // 24H Backup Profile
-            // console.log(`✅ [BOOKMAKER] Cache updated (SelectionTS: ${res.data?.selectionTs || 'N/A'})`);
+            await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 });
             return res.data;
         }
 
@@ -75,36 +70,32 @@ async function fetchAndCacheBookmaker(eventId, retry = true) {
         if (retry && (error.message === "NOT_AUTHORIZED" || error.message === "COOKIE_NOT_READY")) {
             try {
                 const token = await login();
-                await generateCookie(token);
+                await generateCookie();
                 await new Promise(r => setTimeout(r, 200));
                 return await fetchAndCacheBookmaker(eventId, false);
             } catch (e) {}
         }
         
-        // STALE-IF-ERROR FALLBACK TRIGGER
+        // STALE-IF-ERROR FALLBACK
         try {
             const cacheKey = `${CACHE_KEY_PREFIX}${eventId}`;
             const backup = await redisClient.get(cacheKey);
             if (backup) {
                 const envelope = JSON.parse(backup);
-                console.log(`🛡️ [BOOKMAKER] API Failed (${error.message}). Returning STALE 24H Backup for Event: ${eventId}`);
                 return envelope.payload || envelope;
             }
-        } catch (fallbackError) {}
-
+        } catch (fError) {}
+        
         console.error(`❌ [BOOKMAKER] Error ${eventId}:`, error.message);
     }
     return null;
     })();
 
-    // Set the lock
     inFlightRequests.set(lockKey, fetchPromise);
     
     try {
-        const result = await fetchPromise;
-        return result;
+        return await fetchPromise;
     } finally {
-        // Clear the lock immediately after the promise resolves or rejects
         inFlightRequests.delete(lockKey);
     }
 }
@@ -120,16 +111,11 @@ async function getCachedBookmaker(eventId) {
             const envelope = JSON.parse(cachedData);
             if (envelope.payload) {
                 L1_CACHE.set(cacheKey, { data: envelope.payload, expiry: Date.now() + L1_TTL });
-                return envelope.payload; // Always return from cache, ignore age bounds to prevent stampede
+                return envelope.payload;
             }
-            L1_CACHE.set(cacheKey, { data: envelope, expiry: Date.now() + L1_TTL });
-            return envelope; // Legacy fallback
         }
     } catch (e) {}
     return null;
 }
 
-module.exports = {
-    fetchAndCacheBookmaker,
-    getCachedBookmaker
-};
+module.exports = { fetchAndCacheBookmaker, getCachedBookmaker };

@@ -1,6 +1,5 @@
 const axios = require('axios');
 const redisClient = require('../utils/redis');
-const httpClient = require('../utils/httpClient');
 const SystemConfig = require('../models/SystemConfig');
 const { getCookie, generateCookie } = require('../controllers/cookie.controller');
 const { login } = require('../controllers/auth.controller');
@@ -49,7 +48,8 @@ async function coreFetch(params, retry = true) {
         const jsessionid = cookie.split("JSESSIONID=")[1]?.split(";")[0];
         if (!jsessionid) throw new Error("INVALID_COOKIE_FORMAT");
 
-        const exactUrl = `${OCER_MENU_API};jsessionid=${jsessionid}`;
+        // Clean URL (no semicolon for Bigwin compatibility)
+        const exactUrl = OCER_MENU_API;
         
         const body = new URLSearchParams({
             eventType: params.eventType || "-1",
@@ -60,15 +60,16 @@ async function coreFetch(params, retry = true) {
             queryPass: jsessionid
         }).toString();
 
-        const res = await httpClient.post(exactUrl, body, {
+        const res = await axios.post(exactUrl, body, {
             headers: {
+                "Accept": "application/json, text/plain, */*",
                 "Authorization": jsessionid,
-                "Origin": "https://www.gu21go76.xyz",
-                "Referer": "https://www.gu21go76.xyz/",
+                "Origin": DEFAULT_ORIGIN,
+                "Referer": DEFAULT_REFERER,
                 "X-Requested-With": "XMLHttpRequest",
                 "Cookie": cookie,
                 "Source": "1",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
             },
             timeout: 20000,
             validateStatus: (status) => status === 200
@@ -93,7 +94,7 @@ async function coreFetch(params, retry = true) {
             console.log(`🚑 [MENU_SERVICE] Self-healing activated...`);
             try {
                 const token = await login();
-                await generateCookie(token);
+                await generateCookie();
                 await new Promise(r => setTimeout(r, 200));
                 return await coreFetch(params, false); // Retry once WITHOUT lock rules
             } catch (retryErr) {

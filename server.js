@@ -77,7 +77,7 @@ app.use("/nw/v1", menuRoutes);
 app.use("/nw/v1/result", resultRoutes);
 
 const { getCookie } = require("./controllers/cookie.controller");
-const { getToken } = require("./controllers/auth.controller");
+const { getTokens } = require("./controllers/auth.controller");
 
 
 
@@ -132,9 +132,11 @@ app.get("/test", (req, res) => {
 });
 
 app.get("/debug/status", (req, res) => {
+  const tokens = getTokens();
   res.json({
     cookie: getCookie() ? "READY" : "MISSING",
-    token: getToken() ? "READY" : "MISSING",
+    token: tokens.token ? "READY" : "MISSING",
+    usernameToken: tokens.usernameToken ? "READY" : "MISSING",
     env: process.env.NODE_ENV || "development"
   });
 });
@@ -167,7 +169,7 @@ const connectDB = require("./config/db");
       console.log("⚠️ CACHE MISS - DOING FRESH LOGIN...");
       // 2️⃣ Fallback: Fresh Login
       const token = await login();
-      await generateCookie(token);
+      await generateCookie();
       console.log("✅ SYSTEM READY (FRESH LOGIN)");
     }
 

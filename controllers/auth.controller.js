@@ -1,47 +1,52 @@
 const axios = require("axios");
-const FormData = require("form-data");
 const SystemConfig = require("../models/SystemConfig");
 const { LOGIN_URL, AUTH } = require("../config/config");
-const { setToken, getToken } = require("../storage/token"); // ensure storage/token.js exist
+const { setTokens, getTokens } = require("../storage/token");
 
 async function login() {
   try {
-    const form = new FormData();
-    form.append("account_id", AUTH.account_id);
-    form.append("password", AUTH.password);
-    form.append("verify_token", "");
-    form.append("country_code", AUTH.country_code);
+    console.log("📡 ATTEMPTING BIGWIN LOGIN...");
+    
+    // Payload for Bigwin login
+    const payload = {
+      username: AUTH.username,
+      password: AUTH.password,
+      site_auth_key: AUTH.site_auth_key
+    };
 
-    const res = await axios.post(LOGIN_URL, form, {
+    const res = await axios.post(LOGIN_URL, payload, {
       headers: {
-        ...form.getHeaders(),
-        "User-Agent": "Mozilla/5.0 Chrome/120",
-        Origin: "https://www.gugobet.net",
-        Referer: "https://www.gugobet.net/",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:149.0) Gecko/20100101 Firefox/149.0",
+        "Origin": "https://bigwin.live",
+        "Referer": "https://bigwin.live/"
       },
       timeout: 15000,
     });
 
-    if (!res.data?.token) {
-      throw new Error("TOKEN_NOT_RECEIVED");
+    if (!res.data?.success || !res.data?.data?.token) {
+      console.log("❌ BIGWIN LOGIN FAILED:", res.data?.message || "Invalid Response");
+      throw new Error("BIGWIN_LOGIN_FAILED");
     }
 
-    // 🔑 SAVE TOKEN IN GLOBAL STORE
-    setToken(res.data.token);
+    const { token, usernameToken } = res.data.data;
+
+    // 🔑 SAVE TOKENS IN GLOBAL STORE
+    setTokens({ token, usernameToken });
 
     // 💾 SAVE TO MONGODB
     await SystemConfig.findOneAndUpdate(
       { key: "AUTH_TOKEN" },
-      { value: res.data },
+      { value: { token, usernameToken } },
       { upsert: true, returnDocument: 'after' }
     );
 
-    console.log("🔑 AUTH TOKEN UPDATED AND SAVED");
+    console.log("🔑 BIGWIN TOKENS UPDATED AND SAVED");
 
-    return res.data.token;
+    return token;
   } catch (err) {
-    console.log("❌ AUTH LOGIN FAILED:", err.message);
-    throw err; // let cron handle retry
+    console.log("❌ AUTH LOGIN FAILED:", err.response?.data || err.message);
+    throw err;
   }
 }
 
@@ -49,14 +54,17 @@ async function loadToken() {
   try {
     const doc = await SystemConfig.findOne({ key: "AUTH_TOKEN" });
     if (doc && doc.value) {
-      setToken(doc.value.token);
-      console.log("✅ LOADED TOKEN FROM DB");
+      setTokens({ 
+        token: doc.value.token, 
+        usernameToken: doc.value.usernameToken 
+      });
+      console.log("✅ LOADED TOKENS FROM DB");
       return doc.value.token;
     }
   } catch (e) {
-    console.log("⚠️ COULD NOT LOAD TOKEN FROM DB:", e.message);
+    console.log("⚠️ COULD NOT LOAD TOKENS FROM DB:", e.message);
   }
   return null;
 }
 
-module.exports = { login, loadToken, getToken };
+module.exports = { login, loadToken, getTokens };

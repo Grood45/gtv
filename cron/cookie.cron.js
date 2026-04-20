@@ -17,7 +17,7 @@ async function refreshAuthAndCookie() {
     // 🔹 STEP 2: COOKIE (5 second delay)
     setTimeout(async () => {
       try {
-        const cookie = await generateCookie(token);
+        const cookie = await generateCookie();
         if (cookie) {
           console.log("✅ COOKIE UPDATED SUCCESSFULLY");
         } else {

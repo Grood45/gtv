@@ -79,7 +79,7 @@ async function fetchStream(matchId, retry = true) {
         // Note: The original code imported login/generateCookie. We must ensure they work.
         // Assuming login() returns token, and generateCookie(token) sets the cookie.
         const token = await login();
-        await generateCookie(token);
+        await generateCookie();
 
         // 2. Retry Fetch (Recursion with retry = false)
         console.log("🔄 Retrying Stream Fetch with New Session...");

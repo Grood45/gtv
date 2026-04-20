@@ -1,4 +1,14 @@
-let GLOBAL_TOKEN = null;
-function setToken(token) { GLOBAL_TOKEN = token; }
-function getToken() { return GLOBAL_TOKEN; }
-module.exports = { setToken, getToken };
+let GLOBAL_TOKENS = {
+  token: null,
+  usernameToken: null
+};
+
+function setTokens(tokens) {
+  GLOBAL_TOKENS = { ...GLOBAL_TOKENS, ...tokens };
+}
+
+function getTokens() {
+  return GLOBAL_TOKENS;
+}
+
+module.exports = { setTokens, getTokens };
