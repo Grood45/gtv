@@ -81,7 +81,10 @@ async function startBackgroundSync() {
 
             // Parallel Execution
             if (syncTasks.length > 0) {
-                console.log(`🔄 [SYNC] Pulse: ${syncTasks.length} tasks matching due times.`);
+                // 📝 Optimized Logging: Only log pulse details every 10 seconds to reduce I/O pressure
+                if (now % 10000 < SYNC_LOOP_TICK) {
+                    console.log(`🔄 [SYNC] Pulse: ${syncTasks.length} tasks matching due times.`);
+                }
                 await Promise.allSettled(syncTasks); // 🚀 CRITICAL: We now AWAIT to prevent socket explosion
             }
 
