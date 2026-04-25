@@ -1,6 +1,6 @@
 const axios = require('axios');
 const redisClient = require('../utils/redis');
-const { getCookie, generateCookie } = require('../controllers/cookie.controller');
+const { getValidCookie, generateCookie } = require('../controllers/cookie.controller');
 const { login } = require('../controllers/auth.controller');
 const { FANCY_RESULT_API, EVENT_RESULTS_API, DEFAULT_ORIGIN, DEFAULT_REFERER } = require('../config/config');
 
@@ -12,34 +12,50 @@ const CACHE_TTL = 600; // 10 minutes
 const inFlightRequests = new Map();
 
 /**
+ * Helper to check if response data is useful/valid
+ * Returns true if data is an array with at least one item
+ */
+function isValidData(data) {
+    if (!data) return false;
+    if (Array.isArray(data)) return data.length > 0;
+    if (typeof data === 'object') return Object.keys(data).length > 0;
+    return false;
+}
+
+/**
  * Fetch results for a specific Fancy market
  * @param {string|number} eventId - The ID of the event
  */
 async function fetchFancyResult(eventId, retry = true) {
     const lockKey = `fancy:${eventId}`;
 
-    // 🛡️ 1. STAMPEDE LOCK: If an identical request is already mid-flight, await it.
+    // 🛡️ 1. STAMPEDE LOCK
     if (inFlightRequests.has(lockKey)) {
         return inFlightRequests.get(lockKey);
     }
 
     const fetchPromise = (async () => {
         try {
-            // 🔎 2. CHECK CACHE FIRST
             const cacheKey = `${FANCY_CACHE_PREFIX}${eventId}`;
+            
+            // 🔎 2. CHECK CACHE FIRST
             const cachedData = await redisClient.get(cacheKey);
-            if (cachedData) {
+            
+            // Note: Even if we have cache, we might want to refresh, 
+            // but for now let's serve cache if it exists.
+            if (cachedData && isValidData(JSON.parse(cachedData))) {
+                // If it's valid data, return it immediately
                 return JSON.parse(cachedData);
             }
 
-            const cookie = getCookie();
+            // 🍪 3. GET ROBUST COOKIE
+            const cookie = await getValidCookie();
             if (!cookie) throw new Error("COOKIE_NOT_READY");
 
             const queryPass = cookie.split("JSESSIONID=")[1]?.split(";")[0];
             if (!queryPass) throw new Error("INVALID_COOKIE_FORMAT");
 
             const exactUrl = FANCY_RESULT_API;
-
             const body = new URLSearchParams({
                 eventId: String(eventId),
                 marketGroup: "1"
@@ -57,7 +73,7 @@ async function fetchFancyResult(eventId, retry = true) {
                     "Source": "1",
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
                 },
-                timeout: 20000,
+                timeout: 15000, // Reduced timeout for better UX
                 validateStatus: (status) => status === 200 || status === 410
             });
 
@@ -65,12 +81,19 @@ async function fetchFancyResult(eventId, retry = true) {
                 throw new Error("NOT_AUTHORIZED");
             }
 
-            // ✅ 3. CACHE SUCCESSFUL RESPONSE
-            if (res.data) {
+            // 🛡️ 4. SMART GUARD: Don't overwrite good cache with empty data
+            if (isValidData(res.data)) {
+                console.log(`✅ [FANCY_RESULT] Valid data received for ${eventId}. Updating cache.`);
                 await redisClient.set(cacheKey, JSON.stringify(res.data), { EX: CACHE_TTL });
+                return res.data;
+            } else {
+                console.log(`⚠️ [FANCY_RESULT] Provider returned EMPTY for ${eventId}. Guarding old cache.`);
+                // If provider is empty but we have OLD cache (even if expired from memory but still in local context)
+                if (cachedData) {
+                    return JSON.parse(cachedData);
+                }
+                return res.data; // Return the empty data if no cache existed at all
             }
-
-            return res.data;
 
         } catch (error) {
             console.error(`❌ Error fetching fancy results for event ID ${eventId}:`, error.message);
@@ -84,9 +107,8 @@ async function fetchFancyResult(eventId, retry = true) {
             )) {
                 console.log(`🚑 [FANCY_RESULT] Self-healing activated for event ${eventId}...`);
                 try {
-                    const token = await login();
+                    await login();
                     await generateCookie();
-                    await new Promise(r => setTimeout(r, 200));
                     return await fetchFancyResult(eventId, false);
                 } catch (retryErr) {
                     console.error("❌ Self-healing failed for fancy result:", retryErr.message);
@@ -96,13 +118,10 @@ async function fetchFancyResult(eventId, retry = true) {
         }
     })();
 
-    // Set the lock
     inFlightRequests.set(lockKey, fetchPromise);
-    
     try {
         return await fetchPromise;
     } finally {
-        // Clear the lock immediately after resolution/rejection
         inFlightRequests.delete(lockKey);
     }
 }
@@ -122,21 +141,22 @@ async function fetchEventResults(type = "today", sportId = "4", retry = true) {
 
     const fetchPromise = (async () => {
         try {
-            // 🔎 2. CHECK CACHE FIRST
             const cacheKey = `${EVENT_CACHE_PREFIX}${type}:${sportId}`;
+
+            // 🔎 2. CHECK CACHE FIRST
             const cachedData = await redisClient.get(cacheKey);
-            if (cachedData) {
+            if (cachedData && isValidData(JSON.parse(cachedData))) {
                 return JSON.parse(cachedData);
             }
 
-            const cookie = getCookie();
+            // 🍪 3. GET ROBUST COOKIE
+            const cookie = await getValidCookie();
             if (!cookie) throw new Error("COOKIE_NOT_READY");
 
             const queryPass = cookie.split("JSESSIONID=")[1]?.split(";")[0];
             if (!queryPass) throw new Error("INVALID_COOKIE_FORMAT");
 
             const exactUrl = EVENT_RESULTS_API;
-
             const body = new URLSearchParams({
                 type: String(type),
                 sport: String(sportId)
@@ -154,7 +174,7 @@ async function fetchEventResults(type = "today", sportId = "4", retry = true) {
                     "Source": "1",
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
                 },
-                timeout: 20000,
+                timeout: 15000,
                 validateStatus: (status) => status === 200 || status === 410
             });
 
@@ -162,17 +182,20 @@ async function fetchEventResults(type = "today", sportId = "4", retry = true) {
                 throw new Error("NOT_AUTHORIZED");
             }
 
-            // ✅ 3. CACHE SUCCESSFUL RESPONSE
-            if (res.data) {
+            // 🛡️ 4. SMART GUARD
+            if (isValidData(res.data)) {
                 await redisClient.set(cacheKey, JSON.stringify(res.data), { EX: CACHE_TTL });
+                return res.data;
+            } else if (cachedData) {
+                return JSON.parse(cachedData);
             }
-
+            
             return res.data;
 
         } catch (error) {
             console.error(`❌ Error fetching event results for sport ${sportId} (${type}):`, error.message);
 
-            // 🔄 SELF-HEALING: Retry ONCE if unauthorized
+            // 🔄 SELF-HEALING
             if (retry && (
                 error.message === "NOT_AUTHORIZED" || 
                 error.message === "COOKIE_NOT_READY" ||
@@ -181,9 +204,8 @@ async function fetchEventResults(type = "today", sportId = "4", retry = true) {
             )) {
                 console.log(`🚑 [EVENT_RESULTS] Self-healing activated...`);
                 try {
-                    const token = await login();
+                    await login();
                     await generateCookie();
-                    await new Promise(r => setTimeout(r, 200));
                     return await fetchEventResults(type, sportId, false);
                 } catch (retryErr) {
                     console.error("❌ Self-healing failed for event results:", retryErr.message);
@@ -193,9 +215,7 @@ async function fetchEventResults(type = "today", sportId = "4", retry = true) {
         }
     })();
 
-    // Set the lock
     inFlightRequests.set(lockKey, fetchPromise);
-    
     try {
         return await fetchPromise;
     } finally {

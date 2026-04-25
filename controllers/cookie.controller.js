@@ -6,8 +6,11 @@ const { getTokens } = require("../storage/token");
 let GLOBAL_COOKIE = null;
 let COOKIE_REFRESHING = false;
 
+/**
+ * Robust cookie generator
+ */
 async function generateCookie() {
-  if (COOKIE_REFRESHING) return GLOBAL_COOKIE;
+  if (COOKIE_REFRESHING) return GLOBAL_COOKIE || (await loadCookie());
   COOKIE_REFRESHING = true;
 
   try {
@@ -16,7 +19,6 @@ async function generateCookie() {
 
     console.log("📡 FETCHING BIGWIN LOGIN URL...");
     
-    // Step 1: Get Login URL from Bigwin
     const keyRes = await axios.post(`${BIGWIN_KEY_URL}?site_auth_key=${AUTH.site_auth_key}`, 
       {
         eventType: 4,
@@ -40,7 +42,6 @@ async function generateCookie() {
 
     const { loginUrl } = keyRes.data;
 
-    // Step 2: Fetch Session Cookie from Login URL
     console.log("📡 FETCHING SESSION COOKIE FROM PROVIDER...");
     const sessionRes = await axios.post(loginUrl, {}, {
       headers: {
@@ -79,6 +80,14 @@ async function generateCookie() {
   }
 }
 
+/**
+ * Returns current cookie, or loads it from DB if missing
+ */
+async function getValidCookie() {
+    if (GLOBAL_COOKIE) return GLOBAL_COOKIE;
+    return await loadCookie();
+}
+
 function getCookie() {
   return GLOBAL_COOKIE;
 }
@@ -97,4 +106,4 @@ async function loadCookie() {
   return null;
 }
 
-module.exports = { generateCookie, getCookie, loadCookie };
+module.exports = { generateCookie, getCookie, loadCookie, getValidCookie };
