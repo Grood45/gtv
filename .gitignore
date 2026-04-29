@@ -31,3 +31,4 @@ nginx_fastodds.conf
 test_bigwin_integrated.js
 test_fancy_fix.js
 verify_all_endpoints.js
+scratch/
