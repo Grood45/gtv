@@ -77,13 +77,15 @@ async function fetchAndCacheBookmaker(eventId, retry = true) {
             } catch (e) {}
         }
         
-        // STALE-IF-ERROR FALLBACK
+        // STALE-IF-ERROR FALLBACK (Limited to 10s)
         try {
             const cacheKey = `${CACHE_KEY_PREFIX}${eventId}`;
-            const backup = await redisClient.get(cacheKey);
-            if (backup) {
-                const envelope = JSON.parse(backup);
-                return envelope.payload || envelope;
+            const backupStr = await redisClient.get(cacheKey);
+            if (backupStr) {
+                const envelope = JSON.parse(backupStr);
+                if (Date.now() - envelope.savedAt < 1000) {
+                    return envelope.payload || envelope;
+                }
             }
         } catch (fError) {}
         

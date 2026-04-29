@@ -76,14 +76,15 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
             } catch (e) {}
         }
         
-        // STALE-IF-ERROR FALLBACK TRIGGER
+        // STALE-IF-ERROR FALLBACK (Limited to 10s)
         try {
             const cacheKey = `${CACHE_KEY_PREFIX}${eventId}:${marketId}`;
-            const backup = await redisClient.get(cacheKey);
-            if (backup) {
-                const envelope = JSON.parse(backup);
-                console.log(`🛡️ [FULL_MARKETS] API Failed (${error.message}). Returning STALE 24H Backup for Event: ${eventId}`);
-                return envelope.payload || envelope;
+            const backupStr = await redisClient.get(cacheKey);
+            if (backupStr) {
+                const envelope = JSON.parse(backupStr);
+                if (Date.now() - envelope.savedAt < 1000) {
+                    return envelope.payload || envelope;
+                }
             }
         } catch (fallbackError) {}
         

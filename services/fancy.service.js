@@ -105,9 +105,9 @@ async function getFancyOdds(eventId, retry = true, forceFetch = false) {
                 } catch (e) {}
             }
             
-            // STALE-IF-ERROR FALLBACK TRIGGER
-            if (staleData) {
-                console.log(`🛡️ [FANCY] API Failed (${error.message}). Returning STALE 24H Backup for Event: ${eventId}`);
+            // STALE-IF-ERROR FALLBACK (Limited to 1 second to prevent permanent "stuck" states)
+            if (staleData && (Date.now() - JSON.parse(await redisClient.get(cacheKey)).savedAt < 1000)) {
+                console.log(`🛡️ [FANCY] API Failed (${error.message}). Returning STALE 1s Backup for Event: ${eventId}`);
                 return staleData;
             }
 

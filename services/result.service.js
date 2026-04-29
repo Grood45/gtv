@@ -81,19 +81,11 @@ async function fetchFancyResult(eventId, retry = true) {
                 throw new Error("NOT_AUTHORIZED");
             }
 
-            // 🛡️ 4. SMART GUARD: Don't overwrite good cache with empty data
-            if (isValidData(res.data)) {
-                console.log(`✅ [FANCY_RESULT] Valid data received for ${eventId}. Updating cache.`);
-                await redisClient.set(cacheKey, JSON.stringify(res.data), { EX: CACHE_TTL });
-                return res.data;
-            } else {
-                console.log(`⚠️ [FANCY_RESULT] Provider returned EMPTY for ${eventId}. Guarding old cache.`);
-                // If provider is empty but we have OLD cache (even if expired from memory but still in local context)
-                if (cachedData) {
-                    return JSON.parse(cachedData);
-                }
-                return res.data; // Return the empty data if no cache existed at all
-            }
+            // 🛡️ 4. EXPERT SYNC: Always update cache with fresh provider data (even if empty)
+            // This prevents "stuck" markets when the provider settles and removes them.
+            console.log(`✅ [FANCY_RESULT] Fresh data received for ${eventId}. Updating cache.`);
+            await redisClient.set(cacheKey, JSON.stringify(res.data), { EX: CACHE_TTL });
+            return res.data;
 
         } catch (error) {
             console.error(`❌ Error fetching fancy results for event ID ${eventId}:`, error.message);
