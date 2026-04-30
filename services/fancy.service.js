@@ -87,13 +87,14 @@ async function getFancyOdds(eventId, retry = true, forceFetch = false) {
             if (res.status === 410 || (res.data && res.data.message === "You have logged out!! Please login and try again!!")) {
                 throw new Error("NOT_AUTHORIZED");
             }
-
-            if (res.data) {
-                const envelope = { savedAt: Date.now(), payload: res.data };
-                L1_CACHE.set(cacheKey, { data: res.data, expiry: Date.now() + L1_TTL });
-                await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 }); // 24H Backup Profile
-                return res.data;
-            }
+            
+            // 🛡️ 2. EXPERT SYNC: Always update cache if status is 200, even if data is empty
+            const finalData = res.data || { fancyBetMarkets: [] };
+            const cacheKey = `fancy_odds:${eventId}`;
+            const envelope = { savedAt: Date.now(), payload: finalData };
+            L1_CACHE.set(cacheKey, { data: finalData, expiry: Date.now() + 1500 });
+            await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 }); // 24H Backup Profile
+            return finalData;
 
         } catch (error) {
             if (retry && (error.message === "NOT_AUTHORIZED" || error.message === "COOKIE_NOT_READY")) {

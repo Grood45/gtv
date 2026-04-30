@@ -58,13 +58,13 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
             throw new Error("NOT_AUTHORIZED");
         }
 
-        if (res.data) {
-            const cacheKey = `${CACHE_KEY_PREFIX}${eventId}:${marketId}`;
-            const envelope = { savedAt: Date.now(), payload: res.data };
-            L1_CACHE.set(cacheKey, { data: res.data, expiry: Date.now() + L1_TTL });
-            await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 }); // 24H Backup Profile
-            return res.data;
-        }
+        // 🛡️ 2. EXPERT SYNC: Always update cache if status is 200, even if data is empty
+        const finalData = res.data || { market: null };
+        const cacheKey = `${CACHE_KEY_PREFIX}${eventId}:${marketId}`;
+        const envelope = { savedAt: Date.now(), payload: finalData };
+        L1_CACHE.set(cacheKey, { data: finalData, expiry: Date.now() + L1_TTL });
+        await redisClient.set(cacheKey, JSON.stringify(envelope), { EX: 86400 });
+        return finalData;
 
     } catch (error) {
         if (retry && (error.message === "NOT_AUTHORIZED" || error.message === "COOKIE_NOT_READY")) {
