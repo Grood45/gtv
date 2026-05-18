@@ -238,8 +238,8 @@ async function getPlayerIframe(req, res) {
         res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.set('Pragma', 'no-cache');
         res.set('Expires', '0');
-        // Allow framing
-        res.set('X-Frame-Options', 'ALLOWALL'); 
+        // Allow framing by removing restrictions
+        res.removeHeader('X-Frame-Options');
         
         return res.send(html);
 

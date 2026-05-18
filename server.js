@@ -44,9 +44,12 @@ app.use(helmet({
       connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://*.skyinplay.com"],
       imgSrc: ["'self'", "data:", "https:"],
       mediaSrc: ["'self'", "blob:", "https:"],
-      frameSrc: ["'self'", "https:"] // 🟢 ALLOW EXTERNAL IFRAMES
+      frameSrc: ["'self'", "https:"], // 🟢 ALLOW EXTERNAL IFRAMES
+      frameAncestors: ["*"] // 🟢 ALLOW EVERYONE TO EMBED US
     }
-  }
+  },
+  crossOriginEmbedderPolicy: false,
+  xFrameOptions: false // 🟢 DISABLES SAMEORIGIN BLOCK FOR IFRAMES
 })); // Security Headers
 app.use(compression()); // Gzip Compression
 app.use(cors()); // Allow Cross-Origin Requests
@@ -155,6 +158,66 @@ app.get("/test", (req, res) => {
                     document.getElementById('preview').innerHTML = code;
                     document.getElementById('result').style.display = 'block';
                 }
+            </script>
+        </body>
+        </html>
+    `);
+});
+
+// 🛠️ MASS TEST PAGE (Generates 20 Iframes concurrently)
+app.get("/mass-test", (req, res) => {
+  res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Mass Stream Tester (20 Streams)</title>
+            <style>
+                body { font-family: sans-serif; padding: 20px; text-align: center; background: #121212; color: white; }
+                input { padding: 10px; width: 300px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; background: #222; color: white; }
+                button { padding: 10px 20px; font-size: 16px; background: #ff3366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+                button:hover { background: #ff1a53; }
+                .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
+                .stream-box { background: #000; border: 2px solid #333; height: 200px; position: relative; }
+                .stream-box iframe { width: 100%; height: 100%; border: none; }
+                .box-number { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.7); padding: 2px 5px; font-size: 12px; color: #ff9933; z-index: 10; font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <h1>🚀 Mass Stream Load Tester</h1>
+            <p>Enter Event ID to simultaneously load 20 streams. This tests for Token Expiration / Logged Off issues.</p>
+            <input type="text" id="eventId" placeholder="Enter Event ID" value="35598773" />
+            <button id="startBtn">Test 20 Streams</button>
+            
+            <div class="grid-container" id="grid"></div>
+
+            <script>
+                document.getElementById('startBtn').addEventListener('click', function() {
+                    var id = document.getElementById('eventId').value.trim();
+                    if(!id) return alert("Please enter Event ID");
+                    
+                    var grid = document.getElementById('grid');
+                    grid.innerHTML = ""; // Clear old boxes
+                    
+                    for (let i = 1; i <= 20; i++) {
+                        // Use relative /embed/ route so it loads locally
+                        var url = "/embed/" + id;
+                        
+                        var box = document.createElement('div');
+                        box.className = 'stream-box';
+                        
+                        var badge = document.createElement('div');
+                        badge.className = 'box-number';
+                        badge.innerText = "Stream " + i;
+                        
+                        var iframe = document.createElement('iframe');
+                        iframe.src = url;
+                        iframe.setAttribute("allowfullscreen", "true");
+                        
+                        box.appendChild(badge);
+                        box.appendChild(iframe);
+                        grid.appendChild(box);
+                    }
+                });
             </script>
         </body>
         </html>
