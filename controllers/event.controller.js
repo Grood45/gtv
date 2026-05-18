@@ -76,10 +76,25 @@ async function getPlayerIframe(req, res) {
     try {
         const { eventId } = req.params;
 
+        const errorHtml = (msg) => `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; background-color: #080808; display: flex; justify-content: center; align-items: center; font-family: 'Arial', sans-serif; }
+                h2 { color: #fff; letter-spacing: 1px; font-weight: normal; }
+            </style>
+        </head>
+        <body><h2>${msg}</h2></body>
+        </html>
+        `;
+
         // 1. Find Event in DB
         const event = await Event.findOne({ eventId });
         if (!event) {
-            return res.send("<h2 style='color:white; text-align:center; font-family:sans-serif; margin-top:20px;'>Event not found</h2>");
+            return res.send(errorHtml("Event not found"));
         }
 
         // 2. Extract Streaming Channel
@@ -106,7 +121,7 @@ async function getPlayerIframe(req, res) {
 
         // 4. Build HTML
         if (!streamUrl || streamUrl === "") {
-            return res.send("<h2 style='color:white; text-align:center; font-family:sans-serif; margin-top:20px;'>Match will start soon...</h2>");
+            return res.send(errorHtml("Match will start soon..."));
         }
 
         const html = `
