@@ -76,7 +76,7 @@ async function getPlayerIframe(req, res) {
     try {
         const { eventId } = req.params;
 
-        const errorHtml = (msg) => `
+        const errorHtml = (title, subtext, icon) => `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -84,17 +84,31 @@ async function getPlayerIframe(req, res) {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
                 body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; background-color: #080808; display: flex; justify-content: center; align-items: center; font-family: 'Arial', sans-serif; }
-                h2 { color: #fff; letter-spacing: 1px; font-weight: normal; }
+                .message-box { text-align: center; background: #12121a; padding: 40px 60px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid #2a2a35; }
+                .icon { font-size: 50px; margin-bottom: 20px; animation: pulse 2s infinite; }
+                h2 { color: #fff; letter-spacing: 2px; font-weight: bold; margin: 0 0 10px 0; font-size: 22px; text-transform: uppercase; }
+                p { color: #8a8a9a; margin: 0; font-size: 14px; letter-spacing: 0.5px; }
+                @keyframes pulse {
+                    0% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.1); opacity: 0.7; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
             </style>
         </head>
-        <body><h2>${msg}</h2></body>
+        <body>
+            <div class="message-box">
+                <div class="icon">${icon}</div>
+                <h2>${title}</h2>
+                <p>${subtext}</p>
+            </div>
+        </body>
         </html>
         `;
 
         // 1. Find Event in DB
         const event = await Event.findOne({ eventId });
         if (!event) {
-            return res.send(errorHtml("Event not found"));
+            return res.send(errorHtml("Event Not Found", "The match you are looking for does not exist.", "🚫"));
         }
 
         // 2. Extract Streaming Channel
@@ -121,7 +135,7 @@ async function getPlayerIframe(req, res) {
 
         // 4. Build HTML
         if (!streamUrl || streamUrl === "") {
-            return res.send(errorHtml("Match will start soon..."));
+            return res.send(errorHtml("Stream Not Available", "Match will start soon or stream is offline.", "⏳"));
         }
 
         const html = `
