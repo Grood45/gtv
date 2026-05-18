@@ -13,6 +13,7 @@ Retrieve live streaming URLs for any match.
 | :--- | :--- | :--- |
 | `/glivestreaming/v1/glive/:matchId` | **GET** | Primary streaming URL generator. |
 | `/glivestreaming/v1/event/:eventId` | **GET** | Fetch stream by Event ID. |
+| `/embed/:eventId` | **GET** | Fully functional HTML Iframe player with loading animation. |
 
 ---
 

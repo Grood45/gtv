@@ -14,7 +14,7 @@ require("./cron/menu.cron");
 require("./cron/cleanup.cron");
 
 const { gliveHandler } = require("./controllers/glive.controller");
-const { getEventStream } = require("./controllers/event.controller");
+const { getEventStream, getPlayerIframe } = require("./controllers/event.controller");
 const fancyRoutes = require("./routes/fancy.routes");
 const eventCountRoutes = require("./routes/eventCount.routes");
 const liveEventsRoutes = require("./routes/liveEvents.routes");
@@ -66,6 +66,7 @@ app.get("/", (req, res) => res.send("GLIVE SERVER IS RUNNING"));
 // ================= API ROUTE =================
 app.get("/glivestreaming/v1/glive/:matchId", gliveHandler);
 app.get("/glivestreaming/v1/event/:eventId", getEventStream);
+app.get("/embed/:eventId", getPlayerIframe);
 app.use("/glivestreaming/v1/fancy", fancyRoutes); // Legacy support
 app.use("/nw/v1/fancy", fancyRoutes); // Optimized path
 app.use("/nw/v1", eventCountRoutes);
