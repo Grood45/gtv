@@ -281,7 +281,6 @@ const connectDB = require("./config/db");
     } else {
       console.log("⚠️ CACHE MISS - DOING FRESH LOGIN...");
       // 2️⃣ Fallback: Fresh Login
-      const token = await login();
       await generateCookie();
       console.log("✅ SYSTEM READY (FRESH LOGIN)");
     }

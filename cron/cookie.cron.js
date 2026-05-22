@@ -6,30 +6,14 @@ async function refreshAuthAndCookie() {
   console.log("♻️ AUTH + COOKIE CRON START");
 
   try {
-    // 🔹 STEP 1: AUTH
-    const token = await login();
-    if (!token) {
-      console.log("❌ AUTH FAILED – COOKIE SKIPPED");
-      return;
+    const cookie = await generateCookie();
+    if (cookie) {
+      console.log("✅ CRON: COOKIE UPDATED SUCCESSFULLY");
+    } else {
+      console.log("⚠️ CRON: COOKIE NOT UPDATED");
     }
-    console.log("✅ AUTH TOKEN RECEIVED");
-
-    // 🔹 STEP 2: COOKIE (5 second delay)
-    setTimeout(async () => {
-      try {
-        const cookie = await generateCookie();
-        if (cookie) {
-          console.log("✅ COOKIE UPDATED SUCCESSFULLY");
-        } else {
-          console.log("⚠️ COOKIE NOT UPDATED – USING OLD COOKIE");
-        }
-      } catch (e) {
-        console.log("❌ COOKIE ERROR AFTER DELAY:", e.message);
-      }
-    }, 5000); // 5 seconds delay
-
   } catch (e) {
-    console.log("❌ AUTH CRON ERROR:", e.message);
+    console.log("❌ CRON ERROR:", e.message);
   }
 }
 

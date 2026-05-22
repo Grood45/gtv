@@ -37,7 +37,8 @@ async function getFancyOdds(eventId, retry = true, forceFetch = false) {
     }
 
     // 🛡️ 3. If no cache exists OR it's a forceFetch, we lock it so 5000 users wait on ONE fetch.
-    if (inFlightRequests.has(lockKey)) {
+    // (Bypass lock on retry to prevent self-deadlock)
+    if (retry && inFlightRequests.has(lockKey)) {
         return inFlightRequests.get(lockKey);
     }
 
@@ -99,7 +100,6 @@ async function getFancyOdds(eventId, retry = true, forceFetch = false) {
         } catch (error) {
             if (retry && (error.message === "NOT_AUTHORIZED" || error.message === "COOKIE_NOT_READY")) {
                 try {
-                    const token = await login();
                     await generateCookie();
                     await new Promise(r => setTimeout(r, 200));
                     return await getFancyOdds(eventId, false, true);

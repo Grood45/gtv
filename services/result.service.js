@@ -29,8 +29,8 @@ function isValidData(data) {
 async function fetchFancyResult(eventId, retry = true) {
     const lockKey = `fancy:${eventId}`;
 
-    // 🛡️ 1. STAMPEDE LOCK
-    if (inFlightRequests.has(lockKey)) {
+    // 🛡️ 1. STAMPEDE LOCK (Bypass on retry to prevent self-deadlock)
+    if (retry && inFlightRequests.has(lockKey)) {
         return inFlightRequests.get(lockKey);
     }
 
@@ -99,7 +99,6 @@ async function fetchFancyResult(eventId, retry = true) {
             )) {
                 console.log(`🚑 [FANCY_RESULT] Self-healing activated for event ${eventId}...`);
                 try {
-                    await login();
                     await generateCookie();
                     return await fetchFancyResult(eventId, false);
                 } catch (retryErr) {
@@ -126,8 +125,8 @@ async function fetchFancyResult(eventId, retry = true) {
 async function fetchEventResults(type = "today", sportId = "4", retry = true) {
     const lockKey = `event:${type}:${sportId}`;
 
-    // 🛡️ 1. STAMPEDE LOCK
-    if (inFlightRequests.has(lockKey)) {
+    // 🛡️ 1. STAMPEDE LOCK (Bypass on retry to prevent self-deadlock)
+    if (retry && inFlightRequests.has(lockKey)) {
         return inFlightRequests.get(lockKey);
     }
 
@@ -196,7 +195,6 @@ async function fetchEventResults(type = "today", sportId = "4", retry = true) {
             )) {
                 console.log(`🚑 [EVENT_RESULTS] Self-healing activated...`);
                 try {
-                    await login();
                     await generateCookie();
                     return await fetchEventResults(type, sportId, false);
                 } catch (retryErr) {

@@ -93,7 +93,6 @@ async function coreFetch(params, retry = true) {
         )) {
             console.log(`🚑 [MENU_SERVICE] Self-healing activated...`);
             try {
-                const token = await login();
                 await generateCookie();
                 await new Promise(r => setTimeout(r, 200));
                 return await coreFetch(params, false); // Retry once WITHOUT lock rules

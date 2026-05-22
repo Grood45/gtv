@@ -17,8 +17,8 @@ const inFlightRequests = new Map();
 async function fetchAndCacheBookmaker(eventId, retry = true) {
     const lockKey = String(eventId);
     
-    // 🛡️ 1. STAMPEDE LOCK
-    if (inFlightRequests.has(lockKey)) {
+    // 🛡️ 1. STAMPEDE LOCK (Bypass lock on retry to prevent self-deadlock)
+    if (retry && inFlightRequests.has(lockKey)) {
         return inFlightRequests.get(lockKey);
     }
 
@@ -70,7 +70,6 @@ async function fetchAndCacheBookmaker(eventId, retry = true) {
     } catch (error) {
         if (retry && (error.message === "NOT_AUTHORIZED" || error.message === "COOKIE_NOT_READY")) {
             try {
-                const token = await login();
                 await generateCookie();
                 await new Promise(r => setTimeout(r, 200));
                 return await fetchAndCacheBookmaker(eventId, false);

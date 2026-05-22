@@ -75,7 +75,6 @@ async function fetchAndCacheSportEvents(sportId, retry = true) {
         )) {
             console.log(`🚑 [SPORT_EVENTS] Self-healing activated for sport ${sportId}...`);
             try {
-                const token = await login();
                 await generateCookie();
                 await new Promise(r => setTimeout(r, 200));
                 return await fetchAndCacheSportEvents(sportId, false);

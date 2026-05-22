@@ -18,7 +18,8 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
     const lockKey = `${eventId}:${marketId}`;
     
     // 🛡️ 1. STAMPEDE LOCK: If an identical request is already mid-flight, await it instead of firing a 9Wicket request.
-    if (inFlightRequests.has(lockKey)) {
+    // (Bypass lock on retry to prevent self-deadlock)
+    if (retry && inFlightRequests.has(lockKey)) {
         return inFlightRequests.get(lockKey);
     }
 
@@ -69,7 +70,6 @@ async function fetchAndCacheFullMarkets(eventId, marketId, retry = true) {
     } catch (error) {
         if (retry && (error.message === "NOT_AUTHORIZED" || error.message === "COOKIE_NOT_READY")) {
             try {
-                const token = await login();
                 await generateCookie();
                 await new Promise(r => setTimeout(r, 200));
                 return await fetchAndCacheFullMarkets(eventId, marketId, false);

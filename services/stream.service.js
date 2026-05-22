@@ -75,10 +75,7 @@ async function fetchStream(matchId, retry = true) {
     )) {
       console.log("🚑 SELF-HEALING ACTIVATED: Refreshing Session...");
       try {
-        // 1. Generate New Cookie (Login logic internal to generateCookie or login+generateCookie)
-        // Note: The original code imported login/generateCookie. We must ensure they work.
-        // Assuming login() returns token, and generateCookie(token) sets the cookie.
-        const token = await login();
+        // 1. Generate New Cookie (Login logic internal to generateCookie)
         await generateCookie();
 
         // 2. Retry Fetch (Recursion with retry = false)
