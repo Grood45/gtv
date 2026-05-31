@@ -1,6 +1,7 @@
 const SystemConfig = require("../models/SystemConfig");
 const bigwinAdapter = require("../adapters/bigwin.adapter");
 const skypuntAdapter = require("../adapters/skypunt.adapter");
+const ninewicketsAdapter = require("../adapters/ninewickets.adapter");
 
 let GLOBAL_COOKIE = null;
 let refreshPromise = null;
@@ -15,6 +16,7 @@ async function generateCookie() {
 
       const useSkypunt = process.env.USE_SKYPUNT_PROVIDER === 'true';
       const useBigwin = process.env.USE_BIGWIN_PROVIDER === 'true';
+      const useNineWickets = process.env.USE_NINEWICKETS_PROVIDER === 'true';
 
       // 🚀 STRATEGY PATTERN: Delegate to the active adapter
       if (useSkypunt) {
@@ -23,9 +25,13 @@ async function generateCookie() {
       } else if (useBigwin) {
         providerName = "BIGWIN";
         newCookieValue = await bigwinAdapter.initSession();
+      } else if (useNineWickets) {
+        providerName = "NINEWICKETS";
+        newCookieValue = await ninewicketsAdapter.initSession();
       } else {
         throw new Error("NO_COOKIE_PROVIDER_ENABLED_IN_ENV");
       }
+
 
       if (!newCookieValue) throw new Error("FAILED_TO_GENERATE_COOKIE");
 

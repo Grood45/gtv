@@ -44,4 +44,9 @@ module.exports = {
     password: process.env.AUTH_PASSWORD,
     site_auth_key: process.env.SITE_AUTH_KEY || "BspAuthKey123",
   },
+  NINEWICKETS: {
+    username: process.env.NINEWICKETS_USERNAME || "9wdemo15",
+    password: process.env.NINEWICKETS_PASSWORD || "Abcd1234",
+  },
 };
+
